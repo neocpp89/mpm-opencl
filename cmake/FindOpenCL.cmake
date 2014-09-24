@@ -14,6 +14,7 @@ IF(CMAKE_SIZEOF_VOID_P EQUAL 4)
         $ENV{AMDAPPSDKROOT}/lib/x86
         $ENV{INTELOCLSDKROOT}/lib/x86
         $ENV{NVSDKCOMPUTE_ROOT}/OpenCL/common/lib/Win32
+        /usr/lib/nvidia
         # Legacy Stream SDK
         $ENV{ATISTREAMSDKROOT}/lib/x86)
 ELSEIF(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -22,6 +23,7 @@ ELSEIF(CMAKE_SIZEOF_VOID_P EQUAL 8)
         $ENV{AMDAPPSDKROOT}/lib/x86_64
         $ENV{INTELOCLSDKROOT}/lib/x64
         $ENV{NVSDKCOMPUTE_ROOT}/OpenCL/common/lib/x64
+        /usr/lib64/nvidia
         # Legacy stream SDK
         $ENV{ATISTREAMSDKROOT}/lib/x86_64)
 ENDIF(CMAKE_SIZEOF_VOID_P EQUAL 4)
