@@ -9,3 +9,6 @@ SET(CMAKE_CXX_FLAGS "-march=native -std=c++11")
 
 ADD_EXECUTABLE(clTut tutorial.cpp)
 TARGET_LINK_LIBRARIES(clTut ${OPENCL_LIBRARY})
+
+enable_testing()
+add_test(tutorial clTut)
