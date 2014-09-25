@@ -1,5 +1,9 @@
     #if 0
     #include <iostream>
+    #define CL_USE_DEPRECATED_OPENCL_1_1_APIS
+    #include <iostream>
+    #include <CL/cl.h>
+    #undef CL_VERSION_1_2
     #include <CL/cl.hpp>
      
     int main(){
@@ -89,9 +93,12 @@ simple_add(eargs, buffer_A,buffer_B,buffer_C).wait();
 
     #else
 
+#define CL_USE_DEPRECATED_OPENCL_1_1_APIS
+#include <CL/cl.h>
+#undef CL_VERSION_1_2
+#include <CL/cl.hpp>
 #include <iostream>
 #include <vector>
-#include <CL/cl.hpp>
 
 int main() {
 
