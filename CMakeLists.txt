@@ -1,14 +1,15 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(clTutorial)
+PROJECT(mpm-opencl)
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+SET(CMAKE_CXX_FLAGS "-march=native -std=c++11")
 
 FIND_PACKAGE(OpenCL REQUIRED)
 INCLUDE_DIRECTORIES(${OPENCL_INCLUDE_DIR})
 
-SET(CMAKE_CXX_FLAGS "-march=native -std=c++11")
-
-ADD_EXECUTABLE(clTut tutorial.cpp)
-TARGET_LINK_LIBRARIES(clTut ${OPENCL_LIBRARY})
-
 enable_testing()
-add_test(tutorial clTut)
+
+ADD_SUBDIRECTORY(sim)
+ADD_SUBDIRECTORY(tests)
+
+# add_test()
+
