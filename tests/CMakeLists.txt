@@ -1,3 +1,5 @@
 enable_testing()
+add_executable(TensorTest TensorTest.cpp)
 add_executable(t1 test.cpp)
 add_test(inital t1)
+add_test(Tensor TensorTest)
