@@ -13,11 +13,11 @@ class Tensor
     private:
         std::array<Real, dimension*dimension> data;
 
-        size_t linearIndex(const size_t i, const size_t j) const { return (i * dimension + j); }
+        static size_t linearIndex(const size_t i, const size_t j) { return (i * dimension + j); }
 
     public:
         Tensor() { return; }
-        Tensor(const std::array<Real, dimension*dimension> A)
+        Tensor(const std::array<Real, dimension*dimension> &A)
         {
             for (size_t i = 0; i < dimension; i++) {
                 for (size_t j = 0; j < dimension; j++) {
@@ -38,9 +38,9 @@ class Tensor
         }
         ~Tensor() { return; }
 
-        size_t dim() const { return dimension; }
+        static size_t dim() { return dimension; }
 
-        Real trace()
+        Real trace() const
         {
             Real tr = 0;
             for (size_t i = 0; i < dimension; i++) {
@@ -49,7 +49,7 @@ class Tensor
             return tr;
         }
 
-        void decompose(Tensor &deviator, Real &spherical)
+        void decompose(Tensor &deviator, Real &spherical) const
         {
             spherical = this->trace() / (Real)dimension;
             for (size_t i = 0; i < dimension; i++) {
@@ -60,7 +60,7 @@ class Tensor
             }
         }
 
-        Tensor deviator()
+        Tensor deviator() const
         {
             Tensor dev;
             Real tr;
@@ -68,7 +68,7 @@ class Tensor
             return dev;
         }
 
-        Real contraction(const Tensor &A)
+        Real contraction(const Tensor &A) const
         {
             Real s = 0;
 
@@ -81,7 +81,7 @@ class Tensor
             return s;
         }
 
-        Real frobeniusNorm()
+        Real frobeniusNorm() const
         {
             return std::sqrt(contraction(*this));
         }

@@ -17,7 +17,7 @@ namespace TerminalColors {
         FG_GREEN = 32
     };
 
-    std::string Colorize(std::string const s, int code = 39)
+    std::string Colorize(std::string const &s, int code = 39)
     {
         return "\033[" + std::to_string(code) + "m" + s + "\033[39m";
     }
