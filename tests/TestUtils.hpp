@@ -1,9 +1,12 @@
+#ifndef TEST_UTILS_HPP
+#define TEST_UTILS_HPP
 #include <iostream>
+#include <iomanip>
 #include <string>
 
 #define TEST(cond) do { \
  bool _test = cond; \
- std::cout << std::string(#cond) << ": ";\
+ std::cout << std::setw(42) << std::string(#cond) << ": ";\
  if (!_test) { \
     std::cout << TerminalColors::FailedString << std::endl; exit(1); \
  } else { \
@@ -25,4 +28,4 @@ namespace TerminalColors {
     const std::string FailedString = Colorize("FAILED", FG_RED);
     const std::string PassedString = Colorize("PASSED", FG_GREEN);
 }
-
+#endif //TEST_UTILS_HPP

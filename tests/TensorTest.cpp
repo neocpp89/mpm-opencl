@@ -3,20 +3,6 @@
 #include "TestUtils.hpp"
 #include "Tensor.hpp"
 
-double myfunc(size_t seed)
-{
-    Tensor<double, 3> T;
-    Tensor<double, 3> T0;
-    double pr;
-    for (int i = 0; i < T.dim(); i++) {
-        for (int j = 0; j < T.dim(); j++) {
-            T(i,j) = (seed * i + j) ^ seed;
-        }
-    }
-    T.decompose(T0, pr);
-    return T0.frobeniusNorm();
-}
-
 int main(int argc, char **argv)
 {
     Tensor<double, 3> S({1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0});
@@ -75,14 +61,15 @@ int main(int argc, char **argv)
     TEST(A0.contraction(A) == 210.0);
     TEST(A0.contraction(B) == 206.0);
 
-    /* 
-    double c = 0;
-    for (size_t seed = 1; seed < 10000000L; seed++) {
-        c += myfunc(seed);
-        // std::cout << myfunc(seed) << std::endl;
-    }
-    std::cout << c << std::endl;
-    */
+    // Test operators
+    double c = 2;
+    Tensor<double, 3> expectedMult({2.0,4.0,6.0,8.0,10.0,12.0,14.0,16.0,18.0});
+    TEST(c * A == expectedMult);
+    TEST(A * c == expectedMult);
+    Tensor<double, 3> expectedAdd({-3.0,4.0,6.0,8.0,5.0,12.0,14.0,16.0,13.0});
+    TEST(A + expectedMult == 3 * A);
+    TEST(A + A0 != 3 * A);
+    TEST(A + A0 == expectedAdd);
 
     std::cout << TerminalColors::Colorize("All tests passed.", TerminalColors::FG_GREEN) << std::endl;
     return 0;

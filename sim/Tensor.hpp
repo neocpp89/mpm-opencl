@@ -87,7 +87,7 @@ class Tensor
         }
 
         Real & operator()(const size_t i, const size_t j) { return data[linearIndex(i, j)]; }
-        Real operator()(const size_t i, const size_t j) const { return data[linearIndex(i, j)]; }
+        const Real & operator()(const size_t i, const size_t j) const { return data[linearIndex(i, j)]; }
 
         void swap(Tensor &A)
         {
@@ -98,7 +98,7 @@ class Tensor
         Tensor & operator=(Tensor A)
         {
             A.swap(*this);
-            return (*this);
+            return *this;
         }
 
         inline bool operator==(const Tensor &rhs) const
@@ -120,6 +120,47 @@ class Tensor
         inline bool operator!=(const Tensor &rhs) const
         {
             return !operator==(rhs);
+        }
+
+        Tensor & operator*=(const double rhs)
+        {
+            for (size_t i = 0; i < dimension; i++) {
+                for (size_t j = 0; j < dimension; j++) {
+                    data[linearIndex(i, j)] *= rhs;
+                }
+            }
+            return *this;
+        }
+
+        Tensor & operator+=(const double rhs)
+        {
+            for (size_t i = 0; i < dimension; i++) {
+                for (size_t j = 0; j < dimension; j++) {
+                    data[linearIndex(i, j)] += rhs;
+                }
+            }
+            return *this;
+        }
+
+        Tensor & operator+=(const Tensor &rhs)
+        {
+            for (size_t i = 0; i < dimension; i++) {
+                for (size_t j = 0; j < dimension; j++) {
+                    data[linearIndex(i, j)] += rhs(i,j);
+                }
+            }
+            return *this;
+        }
+
+        friend Tensor operator*(const double c, Tensor A)
+        {
+            return A*=c;
+        }
+        friend Tensor operator*(Tensor A, const double c) { return c*A; }
+
+        friend Tensor operator+(Tensor A, const Tensor &B)
+        {
+            return A+=B;
         }
 
         friend std::ostream& operator<<(std::ostream& os, const Tensor& A)
