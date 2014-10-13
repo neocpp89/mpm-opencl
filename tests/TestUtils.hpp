@@ -6,7 +6,7 @@
 
 #define TEST(cond) do { \
  bool _test = cond; \
- std::cout << std::setw(42) << std::string(#cond) << ": ";\
+ std::cout << std::setw(62) << std::string(#cond) << ": ";\
  if (!_test) { \
     std::cout << TerminalColors::FailedString << std::endl; exit(1); \
  } else { \

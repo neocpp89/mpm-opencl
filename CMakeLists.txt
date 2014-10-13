@@ -16,7 +16,8 @@ else ()
         --force-new-ctest-process --output-on-failure)
 endif ()
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/sim)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/sim ${PROJECT_SOURCE_DIR}/configparser)
 ADD_SUBDIRECTORY(sim)
+ADD_SUBDIRECTORY(configparser)
 ADD_SUBDIRECTORY(tests)
 
