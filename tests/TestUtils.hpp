@@ -14,6 +14,11 @@
  } \
 } while (0)
 
+#define ALLPASSED(str) do { \
+    std::cout << str << ": " << \
+    TerminalColors::Colorize("All tests passed.", TerminalColors::FG_GREEN) << std::endl; \
+} while (0)
+
 namespace TerminalColors {
     enum Codes {
         FG_RED = 31,

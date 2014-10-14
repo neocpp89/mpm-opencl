@@ -5,78 +5,50 @@
 
 int main(int argc, char **argv)
 {
-
-    /*
-        Create configuration file parsing class and expected key-value pairs.
-        Also includes default values for the configuration options.
-    */
     StaticConfiguration scfg;
     Configuration *cfg = dynamic_cast<Configuration *>(&scfg);
 
+    // set up one of each type of option
     scfg.addDoubleOption("double_option", 0.25);
     scfg.addIntOption("int_option", 36);
     scfg.addStringOption("string_option", "Hello, World!");
     scfg.addSizeTOption("sizet_option", 203L);
-
     TEST(cfg->getDoubleOption("double_option") == 0.25);
     TEST(cfg->getIntOption("int_option") == 36);
     TEST(cfg->getStringOption("string_option") == "Hello, World!");
     TEST(cfg->getSizeTOption("sizet_option") == 203L);
 
-    std::string cfgfile = "default.cfg";
+    // try to change each of them
+    scfg.setDoubleOption("double_option", 0.5);
+    scfg.setIntOption("int_option", -8);
+    scfg.setStringOption("string_option", "bar");
+    scfg.setSizeTOption("sizet_option", 9L);
+    TEST(cfg->getDoubleOption("double_option") == 0.5);
+    TEST(cfg->getIntOption("int_option") == -8);
+    TEST(cfg->getStringOption("string_option") == "bar");
+    TEST(cfg->getSizeTOption("sizet_option") == 9L);
 
-    /*
-        Parse command line arguments.
-    */
-    if (argc % 2 != 1) {
-        exit(1);
-    } else {
-        std::vector<std::string> keys;
-        std::vector<std::string> vals;
-        for (int i = 1; i < argc; i += 2) {
-            keys.push_back(argv[i]);
-            // We know this access is safe because each argument is paired.
-            vals.push_back(argv[i+1]);
-        }
+    // actually parse a configuration file specified to override defaults
+    const std::string cfgfile = "test.cfg";
+    //std::cout << "Read configuration file (\"" << cfgfile << "\")." << std::endl;
+    scfg.readConfigFile(cfgfile);
+    // std::cout << "Configuration: " << scfg << std::endl;
+    TEST(cfg->getDoubleOption("double_option") == 45.25);
+    TEST(cfg->getIntOption("int_option") == 32);
+    TEST(cfg->getStringOption("string_option") == "foo bar");
+    TEST(cfg->getSizeTOption("sizet_option") == 352L);
 
-        // Check if we're asking for help
-        auto helpit = std::find(keys.begin(), keys.end(), "--help");
-        if (helpit != keys.end()) {
-            exit(0);
-        }
-
-        // Check if we specified the config file on the command line.
-        auto cfgit = std::find(keys.begin(), keys.end(), "cfgfile");
-        if (cfgit != keys.end()) {
-            size_t idx = cfgit - keys.begin();
-            cfgfile = vals[idx];
-
-            // remove config file settings from options
-            keys.erase(cfgit);
-            vals.erase(idx + vals.begin());
-        }
-
-        // actually parse the configuration file specified to override defaults
-        std::cout << "Read configuration file (\"" << cfgfile << "\")." << std::endl;
-        scfg.readConfigFile(cfgfile);
-
-        // overwrite configuration options with those on the command line.
-        for (size_t i = 0; i < keys.size(); i++) {
-            if (scfg.keyExists(keys[i])) {
-                scfg.setTypedOption(keys[i], vals[i]);
-            } else {
-                std::cout << "Unknown option: " << keys[i] << "." << std::endl;
-                exit(1);
-            }
-        }
-    }
-
+    // try to read a nonexistent key
+    bool nonexistentKeyTest = false;
     try {
         const double nonexistent = cfg->getDoubleOption("minRadius");
+        nonexistentKeyTest = false;
     } catch (std::out_of_range &e) {
-        TEST(e.what());
+        nonexistentKeyTest = true;
     }
+    TEST(nonexistentKeyTest);
 
+    ALLPASSED(argv[0]);
     return 0;
 }
 

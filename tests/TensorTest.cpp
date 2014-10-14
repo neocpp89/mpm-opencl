@@ -71,6 +71,6 @@ int main(int argc, char **argv)
     TEST(A + A0 != 3 * A);
     TEST(A + A0 == expectedAdd);
 
-    std::cout << TerminalColors::Colorize("All tests passed.", TerminalColors::FG_GREEN) << std::endl;
+    ALLPASSED(argv[0]);
     return 0;
 }
