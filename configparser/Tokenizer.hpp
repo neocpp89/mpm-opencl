@@ -12,6 +12,8 @@ class Tokenizer
             splitNextLine(std::istream& str, const char delim = ' ');
         static std::vector<std::string>
             splitString(std::string& str, const char delim = ' ');
+        static std::vector<std::string>
+            splitString(const char *str, const char delim = ' ');
 };
 
 #endif //TOKENIZER_HPP

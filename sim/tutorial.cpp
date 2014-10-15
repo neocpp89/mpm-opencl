@@ -5,8 +5,6 @@
 #include <iostream>
 #include <vector>
 
-#include "MaterialPoint.hpp"
-
 int main() {
 
     // Get the platforms

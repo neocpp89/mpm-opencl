@@ -4,6 +4,8 @@
 #include <iomanip>
 #include <string>
 
+#include "Tokenizer.hpp"
+
 #define TEST(cond) do { \
  bool _test = cond; \
  std::cout << std::setw(62) << std::string(#cond) << ": ";\
@@ -15,7 +17,8 @@
 } while (0)
 
 #define ALLPASSED(str) do { \
-    std::cout << str << ": " << \
+    auto _s = str; /* auto _s = Tokenizer::splitString(str, '/').back(); */ \
+    std::cout << _s << ": " << \
     TerminalColors::Colorize("All tests passed.", TerminalColors::FG_GREEN) << std::endl; \
 } while (0)
 
