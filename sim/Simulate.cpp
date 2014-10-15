@@ -27,11 +27,29 @@ try {
         std::cout << " Platform Name: " << (*i).getInfo<CL_PLATFORM_NAME>().c_str()<< std::endl;
     }
 
-    const int W = 8192;
-    const int H = 8192;
+    const unsigned int W = 8192;
+    const unsigned int H = 8192;
 
-    const char* inputFile = "input.bmp";
-    const char* outputFile = "output.bmp";
+    const unsigned short p = 12;
+    const size_t onedim = 1 << p;
+    const size_t numTris = onedim*onedim;
+
+    double *A = new double[2*numTris];
+    double *B = new double[2*numTris];
+    double *C = new double[2*numTris];
+
+
+    for (size_t i = 0; i < onedim; i++) {
+        for (size_t j = 0; j < onedim; j++) {
+            A[2*(i*onedim + j) + 0] = i;
+            A[2*(i*onedim + j) + 1] = j;
+            B[2*(i*onedim + j) + 0] = i+1;
+            B[2*(i*onedim + j) + 1] = j;
+            C[2*(i*onedim + j) + 0] = i+1;
+            C[2*(i*onedim + j) + 1] = j+1;
+        }
+    }
+    std::cout << "Done initializing array.\n";
 
     // Homegrown function to read a BMP from file
     float* ip = new float[W*H];
@@ -69,6 +87,17 @@ try {
     cl::Buffer d_ip = cl::Buffer(context, CL_MEM_READ_ONLY, W*H* sizeof(float));
     cl::Buffer d_op = cl::Buffer(context, CL_MEM_READ_WRITE, W*H* sizeof(float));
     queue.enqueueWriteBuffer(d_ip, CL_TRUE, 0, W*H* sizeof(float), ip);
+    std::cout << "copied original data... " << W*H*sizeof(float) << " bytes." << std::endl;
+
+    // copy host data to gpu
+    cl::Buffer d_A = cl::Buffer(context, CL_MEM_READ_ONLY, 2*numTris*sizeof(double));
+    cl::Buffer d_B = cl::Buffer(context, CL_MEM_READ_ONLY, 2*numTris*sizeof(double));
+    cl::Buffer d_C = cl::Buffer(context, CL_MEM_READ_ONLY, 2*numTris*sizeof(double));
+    std::cout << "alloc'd triangle buffers... " << 2*numTris*sizeof(double) << " bytes." << std::endl;
+    queue.enqueueWriteBuffer(d_A, CL_TRUE, 0, 2*numTris*sizeof(double), A);
+    queue.enqueueWriteBuffer(d_B, CL_TRUE, 0, 2*numTris*sizeof(double), B);
+    queue.enqueueWriteBuffer(d_C, CL_TRUE, 0, 2*numTris*sizeof(double), C);
+    std::cout << "copied triangle data... " << 2*numTris*sizeof(double) << " bytes." << std::endl;
 
     //[H3]Step3 â Runtime kernel compilation
     std::ifstream sourceFileName;
@@ -91,11 +120,13 @@ try {
                         );
 
     cl::Program rotn_program(context, rotn_source);
-    rotn_program.build(devices);
-
+    err = rotn_program.build(devices);;
+    std::string buildlog = rotn_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0], &err);
     std::cout << "Read Kernel:\n" << sourceFile << std::endl;
+    std::cout << "Build log:\n" << buildlog << std::endl;
 
     cl::Kernel rotn_kernel(rotn_program, "img_rotate", &err);
+    cl::Kernel tri2d_sf_kernel(rotn_program, "tri2d_local_coordinates", &err);
 
     //[H3]Step4 â Run the program
     rotn_kernel.setArg(0, d_op);
@@ -104,6 +135,14 @@ try {
     rotn_kernel.setArg(3, H);
     rotn_kernel.setArg(4, sin_theta);
     rotn_kernel.setArg(5, cos_theta);
+
+
+    tri2d_sf_kernel.setArg(0, W*H/16);
+    tri2d_sf_kernel.setArg(1, d_ip);
+    tri2d_sf_kernel.setArg(2, d_ip);
+    tri2d_sf_kernel.setArg(3, d_ip);
+    tri2d_sf_kernel.setArg(4, d_ip);
+    tri2d_sf_kernel.setArg(5, d_op);
 
     // Run the kernel on specific ND range
     cl::NDRange globalws(W,H);
@@ -116,6 +155,14 @@ try {
     queue.enqueueReadBuffer(d_op, CL_TRUE, 0, W*H*sizeof(float), op);
 
     std::cout << "Done rotating image.\n";
+
+    cl::NDRange trirange(W*H/16);
+    for (size_t i = 0; i < 100; i++) {
+        queue.enqueueNDRangeKernel(tri2d_sf_kernel, cl::NullRange, trirange, cl::NullRange);
+    }
+
+    queue.enqueueReadBuffer(d_op, CL_TRUE, 0, W*H*sizeof(float), op);
+    std::cout << "Done calculating local coords.\n";
 
 }
 catch(cl::Error err)
