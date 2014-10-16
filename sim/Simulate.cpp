@@ -13,7 +13,7 @@
 //! You will need to tweak these 2 parameters
 //! Using 0 will always choose the 1st implementation found
 #define PLATFORM_TO_USE 0
-#define DEVICE_TYPE_TO_USE  CL_DEVICE_TYPE_CPU
+#define DEVICE_TYPE_TO_USE  CL_DEVICE_TYPE_ALL
 
 int main(int argc, char ** argv)
 {
