@@ -72,9 +72,9 @@ void tri2d_local_coordinates(
             const double v = (d11 * d20 - d01 * d21) / denom;
             const double w = (d00 * d21 - d01 * d20) / denom;
             const double u = 1.0 - v - w;
-            sf[i].x = v;
-            sf[i].y = w;
-            sf[i].z = u;
+            sf[i] = (double4)(u, v, w, 0);
+        } else {
+            sf[i] = (double4)(0, 0, 0, 0);
         }
     }
     return;

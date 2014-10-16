@@ -33,7 +33,7 @@ try {
     const unsigned int W = 8192;
     const unsigned int H = 8192;
 
-    const unsigned short p = 12;
+    const unsigned short p = 2;
     const size_t onedim = 1 << p;
     const size_t numTris = onedim*onedim;
 
@@ -95,6 +95,22 @@ try {
     cl::Buffer d_A = cl::Buffer(context, CL_MEM_READ_ONLY, numTris*sizeof(cl_double2));
     cl::Buffer d_B = cl::Buffer(context, CL_MEM_READ_ONLY, numTris*sizeof(cl_double2));
     cl::Buffer d_C = cl::Buffer(context, CL_MEM_READ_ONLY, numTris*sizeof(cl_double2));
+
+    if (numTris < 64) {
+        std::cout << "A:\n";
+        for (size_t i = 0; i < numTris; i++) {
+            std::cout << "{" << A[i].s[0] << ", " << A[i].s[1] << "}\n";
+        }
+        std::cout << "B:\n";
+        for (size_t i = 0; i < numTris; i++) {
+            std::cout << "{" << B[i].s[0] << ", " << B[i].s[1] << "}\n";
+        } 
+        std::cout << "C:\n";
+        for (size_t i = 0; i < numTris; i++) {
+            std::cout << "{" << C[i].s[0] << ", " << C[i].s[1] << "}\n";
+        }
+    }
+
     std::cout << "alloc'd triangle buffers... " << numTris*sizeof(cl_double2) << " bytes." << std::endl;
     queue.enqueueWriteBuffer(d_A, CL_TRUE, 0, numTris*sizeof(cl_double2), A);
     queue.enqueueWriteBuffer(d_B, CL_TRUE, 0, numTris*sizeof(cl_double2), B);
@@ -171,6 +187,13 @@ try {
     }
     queue.enqueueReadBuffer(d_sf, CL_TRUE, 0, numTris*sizeof(cl_double4), sf);
     std::cout << "Done calculating local coords.\n";
+
+    if (numTris < 64) {
+        std::cout << "SF:\n";
+        for (size_t i = 0; i < numTris; i++) {
+            std::cout << "{" << sf[i].s[0] << ", " << sf[i].s[1] << ", " << sf[i].s[2] << ", " << sf[i].s[3] << "}\n";
+        }
+    }
 
 }
 catch(cl::Error err)
