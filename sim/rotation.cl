@@ -48,7 +48,7 @@ inline double2 vecfrompts(double2 to, double2 from)
 
 __kernel
 void tri2d_local_coordinates(
-    size_t num_particles,
+    ulong num_particles,
     __global double2* p,
     __global double2* a,
     __global double2* b,

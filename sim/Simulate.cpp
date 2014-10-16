@@ -156,7 +156,7 @@ try {
     rotn_kernel.setArg(5, cos_theta);
 
 
-    tri2d_sf_kernel.setArg(0, numTris);
+    tri2d_sf_kernel.setArg(0, (cl_ulong)numTris);
     tri2d_sf_kernel.setArg(1, d_A);
     tri2d_sf_kernel.setArg(2, d_A);
     tri2d_sf_kernel.setArg(3, d_B);
