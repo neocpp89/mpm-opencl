@@ -48,14 +48,14 @@ inline double2 vecfrompts(double2 to, double2 from)
 
 __kernel
 void tri2d_local_coordinates(
-    uint num_particles,
+    size_t num_particles,
     __global double2* p,
     __global double2* a,
     __global double2* b,
     __global double2* c,
-    __global double3* sf)
+    __global double4* sf)
 {
-    const uint i = get_global_id(0);
+    const size_t i = get_global_id(0);
     
     if (i < num_particles) {
         // from Christer Ericson (Real-Time Collision Detection)
@@ -68,12 +68,14 @@ void tri2d_local_coordinates(
         const double d20 = dot(v2, v0);
         const double d21 = dot(v2, v1);
         const double denom = d00 * d11 - d01 * d01;
-        const double v = (d11 * d20 - d01 * d21) / denom;
-        const double w = (d00 * d21 - d01 * d20) / denom;
-        const double u = 1.0 - v - w;
-        sf[i].x = v;
-        sf[i].y = w;
-        sf[i].z = u;
+        if (denom > 0) {
+            const double v = (d11 * d20 - d01 * d21) / denom;
+            const double w = (d00 * d21 - d01 * d20) / denom;
+            const double u = 1.0 - v - w;
+            sf[i].x = v;
+            sf[i].y = w;
+            sf[i].z = u;
+        }
     }
     return;
 }

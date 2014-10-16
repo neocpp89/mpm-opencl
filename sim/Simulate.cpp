@@ -13,7 +13,7 @@
 //! You will need to tweak these 2 parameters
 //! Using 0 will always choose the 1st implementation found
 #define PLATFORM_TO_USE 0
-#define DEVICE_TYPE_TO_USE  CL_DEVICE_TYPE_GPU
+#define DEVICE_TYPE_TO_USE  CL_DEVICE_TYPE_CPU
 
 int main(int argc, char ** argv)
 {
@@ -37,19 +37,18 @@ try {
     const size_t onedim = 1 << p;
     const size_t numTris = onedim*onedim;
 
-    double *A = new double[2*numTris];
-    double *B = new double[2*numTris];
-    double *C = new double[2*numTris];
-
+    cl_double2 *A = new cl_double2[numTris];
+    cl_double2 *B = new cl_double2[numTris];
+    cl_double2 *C = new cl_double2[numTris];
 
     for (size_t i = 0; i < onedim; i++) {
         for (size_t j = 0; j < onedim; j++) {
-            A[2*(i*onedim + j) + 0] = i;
-            A[2*(i*onedim + j) + 1] = j;
-            B[2*(i*onedim + j) + 0] = i+1;
-            B[2*(i*onedim + j) + 1] = j;
-            C[2*(i*onedim + j) + 0] = i+1;
-            C[2*(i*onedim + j) + 1] = j+1;
+            A[(i*onedim + j)].s[0] = i;
+            A[(i*onedim + j)].s[1] = j;
+            B[(i*onedim + j)].s[0] = i+1;
+            B[(i*onedim + j)].s[1] = j;
+            C[(i*onedim + j)].s[0] = i+1;
+            C[(i*onedim + j)].s[1] = j+1;
         }
     }
     std::cout << "Done initializing array.\n";
@@ -93,15 +92,16 @@ try {
     std::cout << "copied original data... " << W*H*sizeof(float) << " bytes." << std::endl;
 
     // copy host data to gpu
-    cl::Buffer d_A = cl::Buffer(context, CL_MEM_READ_ONLY, 2*numTris*sizeof(double));
-    cl::Buffer d_B = cl::Buffer(context, CL_MEM_READ_ONLY, 2*numTris*sizeof(double));
-    cl::Buffer d_C = cl::Buffer(context, CL_MEM_READ_ONLY, 2*numTris*sizeof(double));
-    std::cout << "alloc'd triangle buffers... " << 2*numTris*sizeof(double) << " bytes." << std::endl;
-    queue.enqueueWriteBuffer(d_A, CL_TRUE, 0, 2*numTris*sizeof(double), A);
-    queue.enqueueWriteBuffer(d_B, CL_TRUE, 0, 2*numTris*sizeof(double), B);
-    queue.enqueueWriteBuffer(d_C, CL_TRUE, 0, 2*numTris*sizeof(double), C);
-    std::cout << "copied triangle data... " << 2*numTris*sizeof(double) << " bytes." << std::endl;
+    cl::Buffer d_A = cl::Buffer(context, CL_MEM_READ_ONLY, numTris*sizeof(cl_double2));
+    cl::Buffer d_B = cl::Buffer(context, CL_MEM_READ_ONLY, numTris*sizeof(cl_double2));
+    cl::Buffer d_C = cl::Buffer(context, CL_MEM_READ_ONLY, numTris*sizeof(cl_double2));
+    std::cout << "alloc'd triangle buffers... " << numTris*sizeof(cl_double2) << " bytes." << std::endl;
+    queue.enqueueWriteBuffer(d_A, CL_TRUE, 0, numTris*sizeof(cl_double2), A);
+    queue.enqueueWriteBuffer(d_B, CL_TRUE, 0, numTris*sizeof(cl_double2), B);
+    queue.enqueueWriteBuffer(d_C, CL_TRUE, 0, numTris*sizeof(cl_double2), C);
+    std::cout << "copied triangle data... " << numTris*sizeof(cl_double2) << " bytes." << std::endl;
 
+    cl::Buffer d_sf = cl::Buffer(context, CL_MEM_READ_WRITE, numTris*sizeof(cl_double4));
     //[H3]Step3 â Runtime kernel compilation
     std::ifstream sourceFileName;
     sourceFileName.open("rotation.cl");
@@ -140,12 +140,12 @@ try {
     rotn_kernel.setArg(5, cos_theta);
 
 
-    tri2d_sf_kernel.setArg(0, W*H/16);
-    tri2d_sf_kernel.setArg(1, d_ip);
-    tri2d_sf_kernel.setArg(2, d_ip);
-    tri2d_sf_kernel.setArg(3, d_ip);
-    tri2d_sf_kernel.setArg(4, d_ip);
-    tri2d_sf_kernel.setArg(5, d_op);
+    tri2d_sf_kernel.setArg(0, numTris);
+    tri2d_sf_kernel.setArg(1, d_A);
+    tri2d_sf_kernel.setArg(2, d_A);
+    tri2d_sf_kernel.setArg(3, d_B);
+    tri2d_sf_kernel.setArg(4, d_C);
+    tri2d_sf_kernel.setArg(5, d_sf);
 
     // Run the kernel on specific ND range
     cl::NDRange globalws(W,H);
@@ -159,12 +159,17 @@ try {
 
     std::cout << "Done rotating image.\n";
 
-    cl::NDRange trirange(W*H/16);
+    cl::NDRange trirange(numTris);
     for (size_t i = 0; i < 100; i++) {
         queue.enqueueNDRangeKernel(tri2d_sf_kernel, cl::NullRange, trirange, cl::NullRange);
     }
 
-    queue.enqueueReadBuffer(d_op, CL_TRUE, 0, W*H*sizeof(float), op);
+    cl_double4 *sf = new cl_double4[numTris];
+    if (sf == NULL) {
+        std::cerr << "FATAL -- can't alloc output buffer." << std::endl;
+        exit(1);
+    }
+    queue.enqueueReadBuffer(d_sf, CL_TRUE, 0, numTris*sizeof(cl_double4), sf);
     std::cout << "Done calculating local coords.\n";
 
 }
