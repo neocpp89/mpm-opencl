@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include "clerror.hpp"
+
 //! You will need to tweak these 2 parameters
 //! Using 0 will always choose the 1st implementation found
 #define PLATFORM_TO_USE 0
@@ -29,9 +31,6 @@ try {
         // pick a platform and do something
         std::cout << " Platform Name: " << (*i).getInfo<CL_PLATFORM_NAME>().c_str()<< std::endl;
     }
-
-    const unsigned int W = 8192;
-    const unsigned int H = 8192;
 
     const unsigned short p = 2;
     const size_t onedim = 1 << p;
@@ -53,20 +52,8 @@ try {
     }
     std::cout << "Done initializing array.\n";
 
-    // Homegrown function to read a BMP from file
-    float* ip = new float[W*H];
-    for (size_t i = 0; i < W; i++) {
-        for (size_t j = 0; j < H; j++) {
-            ip[i*W + j] = (float)j / H;
-        }
-    }
-    float * op = new float[W*H];
-    float theta = 0.125;
-
     //Lets choose the first platform
     cl_context_properties cps[3] = {
-
-
     CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[PLATFORM_TO_USE])(), 0};
 
     // Select the default platform and create a context
@@ -80,16 +67,6 @@ try {
     cl::CommandQueue queue = cl::CommandQueue(context, devices[0], 0, &err);
 
     //[H3] Step2 â Declare Buffers and Move Data
-
-    //We assume that the input image is the array âipâ
-    //and the angle of rotation is theta
-    float cos_theta = cos(theta);
-    float sin_theta = sin(theta);
-
-    cl::Buffer d_ip = cl::Buffer(context, CL_MEM_READ_ONLY, W*H* sizeof(float));
-    cl::Buffer d_op = cl::Buffer(context, CL_MEM_READ_WRITE, W*H* sizeof(float));
-    queue.enqueueWriteBuffer(d_ip, CL_TRUE, 0, W*H* sizeof(float), ip);
-    std::cout << "copied original data... " << W*H*sizeof(float) << " bytes." << std::endl;
 
     // copy host data to gpu
     cl::Buffer d_A = cl::Buffer(context, CL_MEM_READ_ONLY, numTris*sizeof(cl_double2));
@@ -111,11 +88,11 @@ try {
         }
     }
 
-    std::cout << "alloc'd triangle buffers... " << numTris*sizeof(cl_double2) << " bytes." << std::endl;
+    std::cout << "alloc'd triangle buffers... " << numTris*sizeof(cl_double2) << " bytes. (" << numTris*sizeof(cl_double2)/1048576 << " MB)" << std::endl;
     queue.enqueueWriteBuffer(d_A, CL_TRUE, 0, numTris*sizeof(cl_double2), A);
     queue.enqueueWriteBuffer(d_B, CL_TRUE, 0, numTris*sizeof(cl_double2), B);
     queue.enqueueWriteBuffer(d_C, CL_TRUE, 0, numTris*sizeof(cl_double2), C);
-    std::cout << "copied triangle data... " << numTris*sizeof(cl_double2) << " bytes." << std::endl;
+    std::cout << "copied triangle data... " << numTris*sizeof(cl_double2) << " bytes. (" <<  numTris*sizeof(cl_double2)/1048576 << " MB)" << std::endl;
 
     cl::Buffer d_sf = cl::Buffer(context, CL_MEM_READ_WRITE, numTris*sizeof(cl_double4));
     //[H3]Step3 â Runtime kernel compilation
@@ -148,13 +125,6 @@ try {
     cl::Kernel tri2d_sf_kernel(rotn_program, "tri2d_local_coordinates", &err);
 
     //[H3]Step4 â Run the program
-    rotn_kernel.setArg(0, d_op);
-    rotn_kernel.setArg(1, d_ip);
-    rotn_kernel.setArg(2, W);
-    rotn_kernel.setArg(3, H);
-    rotn_kernel.setArg(4, sin_theta);
-    rotn_kernel.setArg(5, cos_theta);
-
 
     tri2d_sf_kernel.setArg(0, (cl_ulong)numTris);
     tri2d_sf_kernel.setArg(1, d_A);
@@ -162,18 +132,6 @@ try {
     tri2d_sf_kernel.setArg(3, d_B);
     tri2d_sf_kernel.setArg(4, d_C);
     tri2d_sf_kernel.setArg(5, d_sf);
-
-    // Run the kernel on specific ND range
-    cl::NDRange globalws(W,H);
-    //In this example the local work group size is not important because
-    //there is no communication between local work items
-
-    queue.enqueueNDRangeKernel(rotn_kernel, cl::NullRange, globalws, cl::NullRange);
-     //[H3]Step5 â Read result back to host
-    // Read buffer d_op into a local op array
-    queue.enqueueReadBuffer(d_op, CL_TRUE, 0, W*H*sizeof(float), op);
-
-    std::cout << "Done rotating image.\n";
 
     cl::NDRange trirange(numTris);
     for (size_t i = 0; i < 100; i++) {
@@ -198,7 +156,7 @@ try {
 }
 catch(cl::Error err)
 {
-   std::cout << err.what() << "(" << err.err() << ")" << std::endl;
+   std::cout << err.what() << "(" << CLErrorMap.at(err.err()) << ")" << std::endl;
 }
 
 }
