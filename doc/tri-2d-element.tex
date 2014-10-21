@@ -1,0 +1,50 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{arrows,calc}
+\begin{document}
+%
+\section{Constant Strain Triange (2D)}
+\begin{tikzpicture}[auto,>=latex',thick]
+    \tikzstyle{n}=[circle, draw=black, minimum size=0.1cm, fill=black]
+    \coordinate (Xm) at (5cm, 0);
+    \coordinate (Ym) at (0, 5cm);
+    \coordinate (xi) at (3cm, 0);
+    \coordinate (eta) at (0, 3cm);
+    \coordinate (origin) at (0,0);
+    \node[n] at (xi) {};
+    \node[n] at (eta) {};
+    \node[n] at (origin) {};
+    \node[below of=xi] {$B$};
+    \node[left of=eta] {$C$};
+    \node[below left of=origin] {$A$};
+    \node[below of=Xm] {$\xi$};
+    \node[left of=Ym] {$\eta$};
+    \draw (0,0) -- (xi) edge[->] (Xm);
+    \draw (0,0) -- (eta) edge[->] (Ym);
+    \draw (xi) -- (eta);
+\end{tikzpicture}
+
+\begin{itemize}
+    \item
+        \begin{align}
+            \begin{bmatrix}
+                x \\
+                y \\
+                1 \\
+            \end{bmatrix}
+            &=
+            \begin{bmatrix}
+                A_x & B_x & C_x \\
+                A_y & B_y & C_y \\
+                1 & 1 & 1 \\
+            \end{bmatrix} 
+            \begin{bmatrix}
+                1 - \xi - \eta \\
+                \xi \\
+                \eta \\
+            \end{bmatrix} \\
+        \end{align}
+\end{itemize}
+
+\end{document}
