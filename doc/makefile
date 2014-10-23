@@ -1,6 +1,7 @@
 TEXSRC = \
     structured-grid-numbering.tex \
-	tri-2d-element.tex
+	tri-2d-element.tex \
+    quad-2d-element.tex
 PDF = $(TEXSRC:.tex=.pdf)
 
 .PHONY: clean

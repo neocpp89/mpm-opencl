@@ -1,12 +1,13 @@
 \documentclass[10pt]{article}
 \usepackage{amsmath}
 \usepackage{tikz}
+\usepackage[margin=1in]{geometry}
 \usetikzlibrary{arrows,calc}
 \begin{document}
 %
 \section{Constant Strain Triangle (2D)}
 \begin{tikzpicture}[>=latex',thick]
-    \tikzstyle{n}=[circle, draw=black, minimum size=0.5cm, fill=black!10]
+    \tikzstyle{n}=[circle, draw=black, minimum size=0.8cm, fill=black!10]
 
     \node[n] (Ao) at (-5cm, 1cm) {$A$};
     \node[n] (Co) at (-7cm, 2cm) {$C$};
@@ -31,6 +32,9 @@
     \node[n] (B) at (xi) {$B'$};
     \node[n] (C) at (eta) {$C'$};
     \node[n] (A) at (origin) {$A'$};
+
+    \node[left of=eta,right] {$1$};
+    \node[below of=xi,above] {$1$};
 
     \draw (A) edge[line width=2pt] (B);
     \draw (B) edge[->] node[pos=1.0, below] {$\xi$} (Xm);
@@ -121,6 +125,12 @@
                 1- \xi - \eta \\
                 \xi \\
                 \eta
+            \end{bmatrix}
+            =
+            \begin{bmatrix}
+                \frac{B_{x} C_{y} - B_{y} C_{x} + x \left(B_{y} - C_{y}\right) - y \left(B_{x} - C_{x}\right)}{A_{x} B_{y} - A_{x} C_{y} - A_{y} B_{x} + A_{y} C_{x} + B_{x} C_{y} - B_{y} C_{x}} \\
+                \frac{- A_{x} C_{y} + A_{y} C_{x} - x \left(A_{y} - C_{y}\right) + y \left(A_{x} - C_{x}\right)}{A_{x} B_{y} - A_{x} C_{y} - A_{y} B_{x} + A_{y} C_{x} + B_{x} C_{y} - B_{y} C_{x}} \\
+                \frac{A_{x} B_{y} - A_{y} B_{x} + x \left(A_{y} - B_{y}\right) - y \left(A_{x} - B_{x}\right)}{A_{x} B_{y} - A_{x} C_{y} - A_{y} B_{x} + A_{y} C_{x} + B_{x} C_{y} - B_{y} C_{x}}
             \end{bmatrix}
         \end{align}
     \item Gradient of shape functions:
