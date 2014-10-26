@@ -1,8 +1,11 @@
 \documentclass[10pt]{article}
+\usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{tikz}
 \usepackage[margin=1in]{geometry}
 \usetikzlibrary{arrows,calc}
+\usepackage{biblatex}
+\addbibresource{./references.bib}
 \begin{document}
 %
 \section{Linear Quadrilateral (2D)}
@@ -171,6 +174,41 @@
                 -(U_y \eta + V_y) & U_x \eta + V_x \\
             \end{bmatrix}
         \end{align}
-\end{itemize}
+    \item Global to local coordinates reproduced from \textcite{hua90}:
+        \begin{align}
+            \begin{bmatrix}
+                U_x & U_y \\
+                V_x & V_y \\
+                W_x & W_y \\
+                S_x & S_y
+            \end{bmatrix}
+            &=
+            \begin{bmatrix}
+                1 & -1 & 1 & -1 \\
+                -1 & 1 & 1 & -1 \\
+                -1 & -1 & 1 & 1 \\
+                1 & 1 & 1 & 1
+            \end{bmatrix}
+            \begin{bmatrix}
+                A_x & A_y \\
+                B_x & B_y \\
+                C_x & C_y \\
+                D_x & D_y
+            \end{bmatrix}
+            \\
+            \begin{bmatrix}
+                S^*_x \\
+                S^*_y
+            \end{bmatrix}
+            &=
+            \begin{bmatrix}
+                4 x - S_x \\
+                4 y - S_y
+            \end{bmatrix}
+        \end{align}
+        Note that except for $S^*_x$ and $S^*_y$, these quantities are the same as used in the jacobian calculation and can be precomputed for the element.
 
+        Using notation from \textcite{hua90}, $r_s = \det \begin{bmatrix} r_x & s_x \\ r_y & s_y \end{bmatrix} = r_x s_y - s_x r_y $.
+\end{itemize}
+\printbibliography
 \end{document}
