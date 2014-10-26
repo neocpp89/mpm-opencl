@@ -121,7 +121,6 @@ try {
     std::cout << "Read Kernel:\n" << sourceFile << std::endl;
     std::cout << "Build log:\n" << buildlog << std::endl;
 
-    cl::Kernel rotn_kernel(rotn_program, "img_rotate", &err);
     cl::Kernel tri2d_sf_kernel(rotn_program, "tri2d_local_coordinates", &err);
 
     //[H3]Step4 â Run the program
