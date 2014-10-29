@@ -42,6 +42,8 @@ int main(int argc, char **argv)
     bool nonexistentKeyTest = false;
     try {
         const double nonexistent = cfg->getDoubleOption("minRadius");
+        std::cout << "Dubious key value (should not reach this!): "
+            << nonexistent << '\n';
         nonexistentKeyTest = false;
     } catch (std::out_of_range &e) {
         nonexistentKeyTest = true;

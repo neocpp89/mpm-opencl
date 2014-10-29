@@ -16,7 +16,16 @@ class Tensor
         static size_t linearIndex(const size_t i, const size_t j) { return (i * dimension + j); }
 
     public:
-        Tensor() { return; }
+        Tensor(const Real c = 0)
+        {
+            for (size_t i = 0; i < dimension; i++) {
+                for (size_t j = 0; j < dimension; j++) {
+                    data[linearIndex(i, j)] = c;
+                }
+            }
+
+            return;
+        }
         Tensor(const std::array<Real, dimension*dimension> &A)
         {
             for (size_t i = 0; i < dimension; i++) {

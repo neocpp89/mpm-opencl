@@ -21,6 +21,15 @@
 
 int main(int argc, char ** argv)
 {
+    size_t platform = 0;
+    size_t device = 0;
+
+    if (argc > 1) {
+        platform = std::stoul(std::string(argv[1]));
+    }
+    if (argc > 2) {
+        device = std::stoul(std::string(argv[2]));
+    }
 
 try {
 

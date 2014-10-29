@@ -1,5 +1,5 @@
 ADD_EXECUTABLE(mpm-opencl Simulate.cpp)
-configure_file(rotation.cl ${CMAKE_CURRENT_BINARY_DIR}/rotation.cl COPYONLY)
+configure_file(MPMKernels.cl ${CMAKE_CURRENT_BINARY_DIR}/MPMKernels.cl COPYONLY)
 TARGET_LINK_LIBRARIES(mpm-opencl ${OPENCL_LIBRARY})
 TARGET_LINK_LIBRARIES(mpm-opencl ${ZLIB_LIBRARY})
 TARGET_INCLUDE_DIRECTORIES(mpm-opencl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
