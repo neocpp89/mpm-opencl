@@ -15,3 +15,10 @@ terminal at the top-level directory:
     make
 
 This results in the executable `mpm-opencl` in the build directory.
+
+## Licensing
+------------
+Some components and libaries are required:
+    + ZLIB (compatible with GPL)
+    + gzstream (LGPL 2.1)
+

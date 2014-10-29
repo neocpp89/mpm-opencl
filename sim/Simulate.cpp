@@ -11,6 +11,8 @@
 #include <vector>
 
 #include "clerror.hpp"
+#include "MaterialPoint.hpp"
+#include "gzstream.hpp"
 
 //! You will need to tweak these 2 parameters
 //! Using 0 will always choose the 1st implementation found
@@ -152,6 +154,17 @@ try {
         }
     }
 
+    MaterialPoint3<double> m;
+    m.Position.x = -21;
+    m.Position.y = 13;
+    m.Position.z = 1251231;
+    m.Velocity.x = 0.1;
+    std::cout << m.getCSVHeaderString() << "\n";
+    std::cout << m.getCSVRowString() << std::endl;
+    ogzstream ogz("test.gz");
+    for (size_t i = 0; i < 1024; i++) {
+        ogz << m.getCSVRowString();
+    }
 }
 catch(cl::Error err)
 {

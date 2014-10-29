@@ -209,6 +209,22 @@
         Note that except for $S^*_x$ and $S^*_y$, these quantities are the same as used in the jacobian calculation and can be precomputed for the element.
 
         Using notation from \textcite{hua90}, $r_s = \det \begin{bmatrix} r_x & s_x \\ r_y & s_y \end{bmatrix} = r_x s_y - s_x r_y $.
+
+        Cases:
+        \begin{align}
+            \begin{bmatrix}
+                \xi \\
+                \eta
+            \end{bmatrix}
+            &=
+            \begin{cases}
+                \begin{bmatrix}
+                    A \\
+                    (U_{S^*} + V_U \xi) / U_W
+                \end{bmatrix} & \mbox{if } U_x U_y U_V U_W \ne 0
+            \end{cases}
+        \end{align}
+
 \end{itemize}
 \printbibliography
 \end{document}
