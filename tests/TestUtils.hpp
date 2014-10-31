@@ -4,17 +4,24 @@
 #include <iomanip>
 #include <string>
 
+#include <cstdlib>
+
 #include "Tokenizer.hpp"
 
-#define TEST(cond) do { \
+#define TEST_MSG(msg, cond) do { \
  bool _test = cond; \
- std::cout << std::setw(62) << std::string(#cond) << ": ";\
+ std::cout << std::setw(62) << std::string(msg) << ": ";\
  if (!_test) { \
-    std::cout << TerminalColors::FailedString << std::endl; exit(1); \
+    std::cout << TerminalColors::FailedString << std::endl; \
+    std::exit(EXIT_FAILURE); \
  } else { \
     std::cout << TerminalColors::PassedString << std::endl; \
  } \
 } while (0)
+
+#define TEST(cond) do { \
+ TEST_MSG(#cond, cond); \
+} while(0)
 
 #define ALLPASSED(str) do { \
     auto _s = str; /* auto _s = Tokenizer::splitString(str, '/').back(); */ \
