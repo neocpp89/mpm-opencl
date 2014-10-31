@@ -6,8 +6,8 @@ import numpy as np
 import matplotlib
 import msh
 
-if (len(sys.argv) < 2):
-    print 'usage:', sys.argv[0], 'MESHFILE'
+if (len(sys.argv) < 3):
+    print 'usage:', sys.argv[0], 'MESHFILE OUTFILE'
     exit(0)
 
 meshdict = msh.read_mesh(sys.argv[1])
@@ -27,6 +27,44 @@ color_list = msh.color_elements_sdl(meshdict, adj_list)
 print 'Mesh colored with', 1+max(color_list), 'colors ('+str(len(meshdict['elements']))+' elements) using SDL ordering.'
 for color in list(set(color_list)):
     print color_list.count(color), "elements colored by color", color
+
+outfile = sys.argv[2]
+with open(outfile, 'w') as f:
+    for i,node in enumerate(meshdict['nodes']):
+        s = 'N,'+str(i)+","+",".join(map(lambda x: x.hex(),node))+'\n'
+        f.write(s)
+
+    element_id = 0
+    for color in list(set(color_list)):
+        elems = filter(lambda T: color_list[T[0]] == color, enumerate(meshdict['elements']))
+        # print elems
+        for element in elems:
+            original_id = element[0]
+            element_nodes = element[1]
+            s = 'E,'+str(element_id)+","+str(color)+","+",".join(map(str, element_nodes))
+            # only output gradients if this is a triangle
+            if meshdict['element_types'][original_id] == 2:
+                s = s+','
+                A = meshdict['nodes'][element_nodes[0]]
+                B = meshdict['nodes'][element_nodes[1]]
+                C = meshdict['nodes'][element_nodes[2]]
+                detJ = (B[0] - A[0])*(C[1] - A[1]) - (B[1] - A[1])*(C[0] - A[0])
+                dNAdx = (B[1] - C[1]) / detJ
+                dNAdy = (C[0] - B[0]) / detJ
+                dNBdx = (C[1] - A[1]) / detJ
+                dNBdy = (A[0] - C[0]) / detJ
+                dNCdx = (A[1] - B[1]) / detJ
+                dNCdy = (B[0] - A[0]) / detJ
+                s = s + dNAdx.hex()+','
+                s = s + dNAdy.hex()+','
+                s = s + dNBdx.hex()+','
+                s = s + dNBdy.hex()+','
+                s = s + dNCdx.hex()+','
+                s = s + dNCdy.hex()+','
+                s = s + detJ.hex()
+            s = s+'\n'
+            f.write(s)
+            element_id += 1
 
 #for profiling coloring
 #sys.exit(0)
