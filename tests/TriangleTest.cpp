@@ -58,17 +58,17 @@ int main(int argc, char ** argv)
 
         // Create context for all devices in the platform.
         cl::Context context(DEVICE_TYPE_TO_USE, cps);
+        std::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 
         // Select the device requested if available.
-        std::cout << "Number of devices in platform: " << platforms.size() << std::endl;
-        std::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+        std::cout << "Number of devices in platform: " << devices.size() << std::endl;
         for (size_t i = 0; i < devices.size(); i++) {
             std::cout << "[" << i << "] Device Name: " <<
                 devices[i].getInfo<CL_DEVICE_NAME>().c_str()<< std::endl;
         }
 
-        std::cout << "Using device " << platform << ".\n";
-        if (platform >= platforms.size()) {
+        std::cout << "Using device " << device << ".\n";
+        if (device >= devices.size()) {
             std::cerr << "Fatal -- Invalid device selected." << std::endl;
             exit(EXIT_FAILURE);
         }
