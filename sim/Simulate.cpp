@@ -118,10 +118,16 @@ try {
                         );
 
     cl::Program rotn_program(context, rotn_source);
-    err = rotn_program.build(devices);;
-    std::string buildlog = rotn_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0], &err);
-    std::cout << "Read Kernel:\n" << sourceFile << std::endl;
-    std::cout << "Build log:\n" << buildlog << std::endl;
+    try {
+        err = rotn_program.build(devices);;
+    } catch (cl::Error exerr) {
+        if (exerr.err() == CL_BUILD_PROGRAM_FAILURE) {
+            std::string buildlog = rotn_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0], &err);
+            std::cout << "Read Kernel:\n" << sourceFile << std::endl;
+            std::cout << "Build log:\n" << buildlog << std::endl;
+        }
+        throw; // propagate upwards since we can't do anything.
+    }
 
     cl::Kernel tri2d_sf_kernel(rotn_program, "tri2d_local_coordinates", &err);
 
@@ -168,10 +174,8 @@ try {
         m.Velocity.x += 0.001;
         ogz << m.getCSVHexRowString() << '\n';
     }
-}
-catch(cl::Error err)
-{
-   std::cout << err.what() << "(" << CLErrorMap.at(err.err()) << ")" << std::endl;
+} catch(cl::Error err) {
+    std::cout << err.what() << "(" << CLErrorMap.at(err.err()) << ")" << std::endl;
 }
 
 }
