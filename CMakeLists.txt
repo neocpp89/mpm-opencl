@@ -17,7 +17,11 @@ else ()
         --force-new-ctest-process --output-on-failure)
 endif ()
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/sim ${PROJECT_SOURCE_DIR}/configparser)
+INCLUDE_DIRECTORIES(
+    ${PROJECT_SOURCE_DIR}/sim
+    ${PROJECT_SOURCE_DIR}/configparser
+    ${PROJECT_SOURCE_DIR}/optionparser
+)
 ADD_SUBDIRECTORY(sim)
 ADD_SUBDIRECTORY(py)
 ADD_SUBDIRECTORY(configparser)

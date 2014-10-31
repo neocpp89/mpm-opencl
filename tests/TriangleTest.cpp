@@ -16,19 +16,82 @@
 #include "clerror.hpp"
 #include "TestUtils.hpp"
 
+#include "optionparser.h"
+
 #define DEVICE_TYPE_TO_USE  CL_DEVICE_TYPE_ALL
+
+struct Arg : public option::Arg
+{
+    static void printError(const char* msg1, const option::Option& opt, const char* msg2)
+    {
+        fprintf(stderr, "%s", msg1);
+        fwrite(opt.name, opt.namelen, 1, stderr);
+        fprintf(stderr, "%s", msg2);
+    }
+
+    static option::ArgStatus Unknown(const option::Option& option, bool msg)
+    {
+        if (msg) printError("Unknown option '", option, "'\n");
+        return option::ARG_ILLEGAL;
+    }
+
+    static option::ArgStatus Required(const option::Option& option, bool msg)
+    {
+        if (option.arg != 0)
+            return option::ARG_OK;
+
+        if (msg) printError("Option '", option, "' requires an argument\n");
+        return option::ARG_ILLEGAL;
+    }
+    static option::ArgStatus Numeric(const option::Option& option, bool msg)
+    {
+        char* endptr = 0;
+        if (option.arg != 0 && strtol(option.arg, &endptr, 10)){};
+        if (endptr != option.arg && *endptr == 0)
+            return option::ARG_OK;
+
+        if (msg) printError("Option '", option, "' requires a numeric argument\n");
+        return option::ARG_ILLEGAL;
+    }
+};
+
+enum optionIndex {UNKNOWN, HELP, TRIPOWER, DEVICE, PLATFORM}; 
+const option::Descriptor usage[] = {
+    { UNKNOWN, 0, "", "", Arg::Unknown, "usage: TriangleTest [options]\n\nOptions:" },
+    { HELP, 0, "h", "help", Arg::None, "    -h, --help \t Print usage and exit." },
+    { TRIPOWER, 0, "t", "triangle-exponent", Arg::Numeric, "    -t <T>, --triangle-exponent=<T> \t Tests 2^<T> triangles on selected device." },
+    { DEVICE, 0, "d", "device", Arg::Numeric, "    -d <D>, --device=<D> \t Use device <D> on selected platform <P>." },
+    { PLATFORM, 0, "p", "platform", Arg::Numeric, "    -p <P>, --platform=<P> \t Select OpenCL platform <P> to run on." },
+    { 0, 0, 0, 0, 0, 0 }
+};
 
 int main(int argc, char ** argv)
 {
+    argc -= (argc > 0); argv += (argc > 0); // skip program name.
+    option::Stats stats(usage, argc, argv);
+    std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
+    std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
+    option::Parser parse(usage, argc, argv, options.get(), buffer.get());
+
+    if (parse.error()) {
+        std::cerr << "FATAL -- error parsing command line options." << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+
+    if (options[HELP]) {
+        option::printUsage(std::cout, usage);
+        std::exit(EXIT_SUCCESS);
+    }
+
     size_t platform = 0;
     size_t device = 0;
     const bool verbose = false;
 
-    if (argc > 1) {
-        platform = std::stoul(std::string(argv[1]));
+    if (options[PLATFORM]) {
+        platform = std::stoull(options[PLATFORM].arg);
     }
-    if (argc > 2) {
-        device = std::stoul(std::string(argv[2]));
+    if (options[DEVICE]) {
+        device = std::stoull(options[DEVICE].arg);
     }
 
     try {
@@ -73,9 +136,13 @@ int main(int argc, char ** argv)
             exit(EXIT_FAILURE);
         }
 
-        const unsigned short p = 2;
+        unsigned short p = 2;
+        if (options[TRIPOWER]) {
+            p = std::stoul(options[TRIPOWER].arg);
+        }
         const size_t onedim = 1 << p;
         const size_t numTris = onedim*onedim;
+        std::cout << "Testing " << numTris << " triangles.\n";
 
         // Create triange vertices. 
         std::unique_ptr<cl_double2 []> A(new cl_double2[numTris]);
