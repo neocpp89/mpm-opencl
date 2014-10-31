@@ -21,11 +21,11 @@ This results in the executable `mpm-opencl` in the build directory.
 ## Licensing
 ------------
 Some components and libaries are required. OpenCL is obviously used as well,
-but has no licensing restriction.:
+but has no licensing restriction.
 
-    * [gzstream][1] (LGPL 2.1)
-    * [The Lean Mean C++ Option Parser][2] (MIT license)
-    * [zlib][3] (compatible with GPL)
+* [gzstream][1] (LGPL 2.1)
+* [The Lean Mean C++ Option Parser][2] (MIT license)
+* [zlib][3] (compatible with GPL)
 
 [1]: https://gist.github.com/piti118/1508048
 [2]: http://optionparser.sourceforge.net/
