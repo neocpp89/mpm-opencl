@@ -69,6 +69,7 @@ with open(outfile, 'w') as f:
 #for profiling coloring
 #sys.exit(0)
 
+'''
 #draw element colors
 ax = pylab.gca()
 cmap = matplotlib.cm.get_cmap('spectral', 1+max(color_list))
@@ -122,7 +123,8 @@ pylab.axis([bb['xmin'],bb['xmax'],bb['ymin'],bb['ymax']])
 pylab.gca().set_aspect('equal', 'box')
 ax2 = pylab.gcf().add_axes([0.92, 0.1, 0.03, 0.8])
 cb = matplotlib.colorbar.ColorbarBase(ax2, cmap=cmap, spacing='proportional')
-ax2.set_yticks([])
-ax2.set_xticks([])
+cb.set_ticks([0,1])
+#ax2.set_yticks([])
+#ax2.set_xticks([])
 pylab.show()
-
+'''
