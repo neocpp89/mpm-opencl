@@ -274,6 +274,7 @@ int main(int argc, char ** argv)
         exit(EXIT_FAILURE);
     }
 
+    ALLPASSED(argv[0]);
     return EXIT_SUCCESS;
 }
 
