@@ -12,7 +12,12 @@ configure_file(../sim/MPMKernels.cl ${CMAKE_CURRENT_BINARY_DIR}/MPMKernels.cl CO
 
 add_executable(GraphTest GraphTest.cpp)
 
+add_executable(MshTest MshTest.cpp)
+target_link_libraries(MshTest LINK_PUBLIC mshutils)
+configure_file(../py/example.msh ${CMAKE_CURRENT_BINARY_DIR}/example.msh  COPYONLY)
+
 add_test(Tensor TensorTest)
 add_test(Configuration ConfigurationTest)
 add_test(Triangle TriangleTest)
 add_test(Graph GraphTest)
+add_test(Msh MshTest)
