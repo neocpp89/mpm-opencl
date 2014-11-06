@@ -4,8 +4,12 @@
 #include <iostream>
 #include <string>
 #include <exception>
+#include <vector>
+#include <set>
 
+#include "Graph.hpp"
 #include "Msh.hpp"
+#include "Timer.hpp"
 
 enum class MshSections {
     MeshFormat,
@@ -33,6 +37,32 @@ const std::map<std::string, MshSections> SectionFromStringMap = {
     { "Comment", MshSections::Comment }
 };
 
+std::ostream & msh::operator<<(std::ostream &os, const msh::Node &node)
+{
+    os << "[\n\tid: " << node.id << '\n';
+    os << "\tcoordinates: ( " << node.x << " " << node.y << " " << node.z << " )\n]";
+    return os;
+}
+
+std::ostream & msh::operator<<(std::ostream &os, const msh::Element &elem)
+{
+    os << "[\n\tid: " << elem.id << '\n';
+    os << "\ttype: " << elem.type << '\n';
+    os << "\tcolor: " << elem.color << '\n';
+    os << "\tnodes: [ ";
+    for (auto const &k : elem.NodeIds) {
+        os << k << " ";
+    }
+    os << "]\n";
+    os << "\ttags : [ ";
+    for (auto const &k : elem.Tags) {
+        os << k << " ";
+    }
+    os << "]\n";
+    os << "]";
+    return os;
+}
+
 void msh::Mesh::parseMeshFormatSection(std::stringstream &section)
 {
     section >> version;
@@ -59,6 +89,7 @@ void msh::Mesh::parseNodesSection(std::stringstream &section)
         }
         size_t node_id;
         section >> node_id;
+        
         Nodes[node_id].id = node_id;
         section >> Nodes[node_id].x;
         section >> Nodes[node_id].y;
@@ -70,13 +101,37 @@ void msh::Mesh::parseNodesSection(std::stringstream &section)
 void msh::Mesh::parseElementsSection(std::stringstream &section)
 {
     section >> numElements;
-    for (size_t i = 0; i < numNodes; i++) {
+    for (size_t i = 0; i < numElements; i++) {
         if (section.fail()) {
             throw std::runtime_error("Wrong number of elements in msh file.");
         }
         size_t element_id;
         section >> element_id;
+
         Elements[element_id].id = element_id;
+        section >> Elements[element_id].type;
+
+        size_t num_tags;
+        section >> num_tags;
+        for (size_t j = 0; j < num_tags; j++) {
+            size_t tag;
+            section >> tag;
+            Elements[element_id].Tags.push_back(tag);
+        }
+
+        std::string s;
+        std::getline(section, s);
+        std::stringstream nodestream;
+        nodestream << s;
+        while (true) {
+            size_t node_id;
+            nodestream >> node_id;
+            if (nodestream.fail()) {
+                break;
+            }
+            Elements[element_id].NodeIds.push_back(node_id);
+        }
+        // std::cout << Elements[element_id] << '\n';
     }
     return;
 }
@@ -98,6 +153,9 @@ void msh::Mesh::readMshFile(std::istream &input)
                         break;
                     case MshSections::Nodes:
                         parseNodesSection(ss);
+                        break;
+                    case MshSections::Elements:
+                        parseElementsSection(ss);
                         break;
                     case MshSections::Comment:
                     default:
@@ -124,3 +182,50 @@ void msh::Mesh::readMshFile(std::istream &input)
     return;
 }
 
+std::map<size_t, std::set<size_t>> 
+findNeighbors(const std::map<size_t, msh::Element> &elements)
+{
+    std::map<size_t, std::vector<size_t>> nodemap;
+    for (auto const &el : elements) {
+        for (auto const n_id : el.second.NodeIds) {
+            nodemap[n_id].push_back(el.second.id);
+        }
+    }
+    // nodemap now contains a map of nodes->elements which include that node
+
+    // For each node, connect every pair of elements that it touches.
+    // The set automatically eliminates the possiblilty of duplicates.
+    std::map<size_t, std::set<size_t>> neighbors;
+    for (auto const &kv : nodemap) {
+        auto v = kv.second;
+        for (auto const &a : v) {
+            for (auto const &b : v) {
+                if (a != b) {
+                    neighbors[a].insert(b);
+                }
+            }
+        }
+    }
+
+    return neighbors;
+}
+
+void msh::Mesh::colorElements()
+{
+    Timer timeit("Mesh Coloring");
+    UndirectedGraph<size_t> g;
+    auto neighbors = findNeighbors(Elements);
+    for (auto const &kv: neighbors) {
+        auto primary = kv.first;
+        for (auto const &secondary: kv.second) {
+            g.connect(primary, secondary);
+        }
+    }
+    size_t colors;
+    g.greedyColoring(colors);
+    std::cout << "Mesh has " << Nodes.size() << " vertices.\n";
+    std::cout << "Mesh has " << Elements.size() << " elements.\n";
+    std::cout << "Colored mesh with " << colors << " colors.\n";
+    // std::cout << g.print();
+    return;
+}

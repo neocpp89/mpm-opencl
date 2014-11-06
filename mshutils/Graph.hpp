@@ -87,7 +87,6 @@ class UndirectedGraph
         {
             std::set<Integral> s;
             for (auto const &k : AdjacencyList) {
-                std::cout << k.first << '\n';
                 s.insert(k.first);
             }
 

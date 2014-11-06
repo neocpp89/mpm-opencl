@@ -1,24 +1,28 @@
 #ifndef MSH_HPP
 #define MSH_HPP
 #include <istream>
+#include <ostream>
 #include <sstream>
 #include <vector>
 #include <map>
 
 namespace msh {
     struct Node {
-        std::vector<size_t> physicalIds;
+        std::vector<size_t> PhysicalIds;
         double x, y, z;
         size_t id;
     };
+    std::ostream & operator<<(std::ostream &os, const Node &elem);
 
     struct Element {
-        std::vector<size_t> nodeIds;
-        std::vector<size_t> physicalIds;
-        std::vector<size_t> tags;
+        std::vector<size_t> NodeIds;
+        std::vector<size_t> PhysicalIds;
+        std::vector<size_t> Tags;
         size_t type;
         size_t id;
+        size_t color;
     };
+    std::ostream & operator<<(std::ostream &os, const Element &elem);
 
     class Mesh {
         private:
@@ -36,12 +40,20 @@ namespace msh {
             void parseNodesSection(std::stringstream &section);
             void parseElementsSection(std::stringstream &section);
 
+            void colorElements();
+
         public:
             Mesh() { return; } 
-            Mesh(std::istream &input) { readMshFile(input); return; }
+            Mesh(std::istream &input)
+            {
+                readMshFile(input);
+                colorElements();
+                return;
+            }
 
             void readMshFile(std::istream &input);
     };
+
 };
 
 
