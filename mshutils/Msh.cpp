@@ -1,4 +1,5 @@
 #include <map>
+#include <unordered_map>
 #include <algorithm>
 #include <istream>
 #include <iostream>
@@ -82,6 +83,7 @@ void msh::Mesh::parseMeshFormatSection(std::stringstream &section)
 
 void msh::Mesh::parseNodesSection(std::stringstream &section)
 {
+    size_t numNodes;
     section >> numNodes;
     for (size_t i = 0; i < numNodes; i++) {
         if (section.fail()) {
@@ -100,6 +102,7 @@ void msh::Mesh::parseNodesSection(std::stringstream &section)
 
 void msh::Mesh::parseElementsSection(std::stringstream &section)
 {
+    size_t numElements;
     section >> numElements;
     for (size_t i = 0; i < numElements; i++) {
         if (section.fail()) {
@@ -182,10 +185,10 @@ void msh::Mesh::readMshFile(std::istream &input)
     return;
 }
 
-std::map<size_t, std::set<size_t>> 
+std::unordered_map<size_t, std::set<size_t>> 
 findNeighbors(const std::map<size_t, msh::Element> &elements)
 {
-    std::map<size_t, std::vector<size_t>> nodemap;
+    std::unordered_map<size_t, std::vector<size_t>> nodemap;
     for (auto const &el : elements) {
         for (auto const n_id : el.second.NodeIds) {
             nodemap[n_id].push_back(el.second.id);
@@ -195,7 +198,7 @@ findNeighbors(const std::map<size_t, msh::Element> &elements)
 
     // For each node, connect every pair of elements that it touches.
     // The set automatically eliminates the possiblilty of duplicates.
-    std::map<size_t, std::set<size_t>> neighbors;
+    std::unordered_map<size_t, std::set<size_t>> neighbors;
     for (auto const &kv : nodemap) {
         auto v = kv.second;
         for (auto const &a : v) {
@@ -222,7 +225,10 @@ void msh::Mesh::colorElements()
         }
     }
     size_t colors;
+    {
+    Timer x("actual coloring");
     g.greedyColoring(colors);
+    }
     std::cout << "Mesh has " << Nodes.size() << " vertices.\n";
     std::cout << "Mesh has " << Elements.size() << " elements.\n";
     std::cout << "Colored mesh with " << colors << " colors.\n";

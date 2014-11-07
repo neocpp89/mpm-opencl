@@ -1,7 +1,7 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <set>
 #include <utility>
 #include <string>
@@ -10,7 +10,7 @@ template <typename Integral = size_t>
 class UndirectedGraph
 {
     private:
-        std::multimap<Integral, Integral> AdjacencyList;
+        std::unordered_multimap<Integral, Integral> AdjacencyList;
 
         void unidirectionalDisconnect(Integral from, Integral which)
         {
@@ -129,10 +129,10 @@ class UndirectedGraph
 
         // returns a map with the key being the node and the value being the color
         // color is from 0 to (num_colors - 1)
-        std::map<Integral, size_t> greedyColoring(size_t &num_colors)
+        std::unordered_map<Integral, size_t> greedyColoring(size_t &num_colors)
         {
 
-            std::map<Integral, size_t> m;
+            std::unordered_map<Integral, size_t> m;
             num_colors = 0;
 
             std::vector<Integral> v;

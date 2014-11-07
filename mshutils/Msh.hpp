@@ -6,6 +6,8 @@
 #include <vector>
 #include <map>
 
+#include "Graph.hpp"
+
 namespace msh {
     struct Node {
         std::vector<size_t> PhysicalIds;
@@ -26,10 +28,7 @@ namespace msh {
 
     class Mesh {
         private:
-            size_t numNodes;
             std::map<size_t, struct Node> Nodes;
-
-            size_t numElements;
             std::map<size_t, struct Element> Elements;
 
             double version;
