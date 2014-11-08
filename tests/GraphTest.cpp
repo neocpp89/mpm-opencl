@@ -1,40 +1,66 @@
 #include <iostream>
 #include <iterator>
+#include <vector>
+#include <algorithm>
 
 #include "TestUtils.hpp"
 #include "Graph.hpp"
+#include "Timer.hpp"
 
 int main(int argc, char **argv)
 {
     UndirectedGraph<int> g;
-    g.connect(0, 10);
-    g.connect(0, 1);
-    g.connect(1, 2);
-    g.connect(2, 10);
-    g.connect(2, 22);
-    g.connect(2, 3);
-    g.connect(2, 1001);
-    std::ostream_iterator<int> out_it (std::cout, ", ");
-    g.neighbors(2, out_it);
+    g.addEdge(0, 10);
+    g.addEdge(0, 1);
+    g.addEdge(2, 1);
+    g.addEdge(2, 10);
+    g.addEdge(2, 22);
+    g.addEdge(2, 3);
+    g.addEdge(2, 1001);
 
+    TEST(g.degree(0) == 2);
+    TEST(g.degree(1) == 2);
+    TEST(g.degree(2) == 5);
+    TEST(g.degree(3) == 1);
+    TEST(g.degree(10) == 2);
+    TEST(g.degree(22) == 1);
+    TEST(g.degree(1001) == 1);
+
+    std::vector<int> neighbors2;
+    g.neighbors(2, std::back_inserter(neighbors2));
+    std::sort(neighbors2.begin(), neighbors2.end());
+    TEST(neighbors2 == std::vector<int>({1,3,10,22,1001}));
+
+    // create a copy of the existing graph
     auto h = g;
-    g.disconnect(2, 1001);
-    std::cout << "deg " << g.degree(2) << '\n';
-    std::cout << g.print() << std::endl;
-    g.deleteVertex(2);
-    std::cout << "deg " << g.degree(2) << '\n';
-    std::cout << g.print() << std::endl;
 
-    h.vertices(out_it);
+    // delete edge on original graph
+    g.disconnect(2, 1001);
+    std::vector<int> deln2;
+    g.neighbors(2, std::back_inserter(deln2));
+    std::sort(deln2.begin(), deln2.end());
+    TEST(deln2 == std::vector<int>({1,3,10,22}));
+
+    // delete vertex entirely
+    g.deleteVertex(2);
+    TEST(g.degree(2) == 0);
 
     size_t colors;
-    auto m = h.greedyColoring(colors);
-    for (auto const &kv : m) {
-        std::cout << "\n\t[" << kv.first << ", " << kv.second << "]"; 
-    }
-    std::cout << '\n';
+    {
+        Timer s("Graph Coloring");
+        auto m = h.greedyColoring(colors);
 
-    std::cout << h.print() << std::endl;
+        // make sure no vertex has the same color as any of its neighbors.
+        for (auto const &k : m) {
+            std::vector<int> vn;
+            h.neighbors(k.first, std::back_inserter(vn));
+            for (auto const &v : vn) {
+                TEST(m[k.first] != m[v]);
+            }
+        }
+    }
+
+    std::cout << "h = " << h.print() << std::endl;
     ALLPASSED(argv[0]);
     return 0;
 }

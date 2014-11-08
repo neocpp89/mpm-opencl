@@ -30,6 +30,11 @@ class UndirectedGraph
         }
 
     public:
+        void addEdge(Integral a, Integral b)
+        {
+            connect(a, b);
+            return;
+        }
         // Connects nodes a and b (and creates them if they don't exist).
         void connect(Integral a, Integral b)
         {
@@ -127,7 +132,7 @@ class UndirectedGraph
             return s;
         }
 
-        // returns a map with the key being the node and the value being the color
+        // returns a map with the key being the vertex and the value being the color
         // color is from 0 to (num_colors - 1)
         std::unordered_map<Integral, size_t> greedyColoring(size_t &num_colors)
         {

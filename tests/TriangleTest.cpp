@@ -15,6 +15,7 @@
 
 #include "clerror.hpp"
 #include "TestUtils.hpp"
+#include "Timer.hpp"
 
 #include "optionparser.h"
 
@@ -241,6 +242,7 @@ int main(int argc, char ** argv)
         tri2d_sf_kernel.setArg(5, d_sf);
 
         for (auto const &b : pointSets) {
+            Timer t("Point Test");
             tri2d_sf_kernel.setArg(1, b.first);
             queue.enqueueNDRangeKernel(tri2d_sf_kernel, cl::NullRange, cl::NDRange(numTris), cl::NullRange);
             queue.enqueueReadBuffer(d_sf, CL_TRUE, 0, numTris*sizeof(cl_double4), sf.get());
