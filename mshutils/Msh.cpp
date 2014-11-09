@@ -12,6 +12,8 @@
 #include "Msh.hpp"
 #include "Timer.hpp"
 
+namespace msh {
+
 enum class MshSections {
     MeshFormat,
     Nodes,
@@ -38,14 +40,14 @@ const std::map<std::string, MshSections> SectionFromStringMap = {
     { "Comment", MshSections::Comment }
 };
 
-std::ostream & msh::operator<<(std::ostream &os, const msh::Node &node)
+std::ostream & operator<<(std::ostream &os, const Node &node)
 {
     os << "[\n\tid: " << node.id << '\n';
     os << "\tcoordinates: ( " << node.x << " " << node.y << " " << node.z << " )\n]";
     return os;
 }
 
-std::ostream & msh::operator<<(std::ostream &os, const msh::Element &elem)
+std::ostream & operator<<(std::ostream &os, const Element &elem)
 {
     os << "[\n\tid: " << elem.id << '\n';
     os << "\ttype: " << elem.type << '\n';
@@ -64,7 +66,7 @@ std::ostream & msh::operator<<(std::ostream &os, const msh::Element &elem)
     return os;
 }
 
-void msh::Mesh::parseMeshFormatSection(std::stringstream &section)
+void Mesh::parseMeshFormatSection(std::stringstream &section)
 {
     section >> version;
     section >> filetype;
@@ -81,7 +83,7 @@ void msh::Mesh::parseMeshFormatSection(std::stringstream &section)
     return;
 }
 
-void msh::Mesh::parseNodesSection(std::stringstream &section)
+void Mesh::parseNodesSection(std::stringstream &section)
 {
     size_t numNodes;
     section >> numNodes;
@@ -100,7 +102,7 @@ void msh::Mesh::parseNodesSection(std::stringstream &section)
     return;
 }
 
-void msh::Mesh::parseElementsSection(std::stringstream &section)
+void Mesh::parseElementsSection(std::stringstream &section)
 {
     size_t numElements;
     section >> numElements;
@@ -139,7 +141,7 @@ void msh::Mesh::parseElementsSection(std::stringstream &section)
     return;
 }
 
-void msh::Mesh::readMshFile(std::istream &input)
+void Mesh::readMshFile(std::istream &input)
 {
     bool inSection = false;
     MshSections currentSection;
@@ -186,7 +188,7 @@ void msh::Mesh::readMshFile(std::istream &input)
 }
 
 std::unordered_map<size_t, std::set<size_t>> 
-findNeighbors(const std::map<size_t, msh::Element> &elements)
+findNeighbors(const std::map<size_t, Element> &elements)
 {
     std::unordered_map<size_t, std::vector<size_t>> nodemap;
     for (auto const &el : elements) {
@@ -213,7 +215,7 @@ findNeighbors(const std::map<size_t, msh::Element> &elements)
     return neighbors;
 }
 
-void msh::Mesh::colorElements()
+void Mesh::colorElements()
 {
     Timer timeit("Mesh Coloring");
     UndirectedGraph<size_t> g;
@@ -234,4 +236,6 @@ void msh::Mesh::colorElements()
     std::cout << "Colored mesh with " << colors << " colors.\n";
     // std::cout << g.print();
     return;
+}
+
 }

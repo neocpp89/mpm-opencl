@@ -146,14 +146,13 @@ class UndirectedGraph
 
             for (auto const &vertex : v) {
                 // tests which colors are occupied (true if occupied)
-                std::vector<bool> sieve;
-                for (size_t i = 0; i <= degree(vertex); i++) {
-                    sieve.push_back(false);
-                }
+                size_t v_degree = degree(vertex);
+                std::vector<bool> sieve(v_degree + 1);
+                std::fill(sieve.begin(), sieve.end(), false);
 
-                std::vector<Integral> vneighbors;
-                std::back_insert_iterator<std::vector<Integral>> vneighborsback(vneighbors);
-                neighbors(vertex, vneighborsback);
+                std::vector<Integral> vneighbors(v_degree);
+                // std::back_insert_iterator<std::vector<Integral>> vneighborsback(vneighbors);
+                neighbors(vertex, vneighbors.begin());
 
                 size_t min_color = 0;
                 for (auto const &n : vneighbors) {

@@ -1,6 +1,16 @@
 // We need doubles...
 #pragma OPENCL EXTENSION cl_khr_fp64: enable
 
+inline double4 integrate_particle_positions(
+    double4 particle_velocity,
+    double4 particle_position,
+    double dt
+)
+{
+    double4 dtv = (double4)(dt, dt, dt, dt);
+    return fma(particle_velocity, dtv, particle_position);
+}
+
 inline double2 vec2frompts(double2 to, double2 from)
 {
     double2 r;
