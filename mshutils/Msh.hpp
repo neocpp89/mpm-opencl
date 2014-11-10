@@ -58,6 +58,7 @@ namespace msh {
             }
 
             void readMshFile(std::istream &input);
+            void writeMT2(std::ostream &output);
     };
 
 };

@@ -45,9 +45,9 @@ int main(int argc, char **argv)
     g.deleteVertex(2);
     TEST(g.degree(2) == 0);
 
-    size_t colors;
     {
-        Timer s("Graph Coloring");
+        Timer s("Greedy Coloring");
+        size_t colors;
         auto m = h.greedyColoring(colors);
 
         // make sure no vertex has the same color as any of its neighbors.
@@ -60,6 +60,21 @@ int main(int argc, char **argv)
         }
     }
 
+    {
+        Timer s("Smallest Degree Last Coloring");
+        size_t colors;
+        // auto m = h.greedyColoring(colors);
+        auto m = h.smallestDegreeLastColoring(colors);
+
+        // make sure no vertex has the same color as any of its neighbors.
+        for (auto const &k : m) {
+            std::vector<int> vn;
+            h.neighbors(k.first, std::back_inserter(vn));
+            for (auto const &v : vn) {
+                TEST(m[k.first] != m[v]);
+            }
+        }
+    }
     std::cout << "h = " << h.print() << std::endl;
     ALLPASSED(argv[0]);
     return 0;

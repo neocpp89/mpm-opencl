@@ -2,9 +2,11 @@
 #define GRAPH_HPP
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <set>
 #include <utility>
 #include <string>
+#include <algorithm>
 
 template <typename Integral = size_t>
 class UndirectedGraph
@@ -35,6 +37,7 @@ class UndirectedGraph
             connect(a, b);
             return;
         }
+
         // Connects nodes a and b (and creates them if they don't exist).
         void connect(Integral a, Integral b)
         {
@@ -65,6 +68,12 @@ class UndirectedGraph
             return;
         }
 
+        void deleteEdge(Integral a, Integral b)
+        {
+            disconnect(a, b);
+            return;
+        }
+
         void disconnect(Integral a, Integral b)
         {
             unidirectionalDisconnect(a, b);
@@ -90,7 +99,7 @@ class UndirectedGraph
         template <typename Iterator>
         void vertices(Iterator output) const
         {
-            std::set<Integral> s;
+            std::unordered_set<Integral> s;
             for (auto const &k : AdjacencyList) {
                 s.insert(k.first);
             }
@@ -103,7 +112,7 @@ class UndirectedGraph
             return;
         }
 
-        size_t degree(Integral a)
+        size_t degree(Integral a) const
         {
             auto k = AdjacencyList.equal_range(a);
             auto begin = k.first;
@@ -134,28 +143,34 @@ class UndirectedGraph
 
         // returns a map with the key being the vertex and the value being the color
         // color is from 0 to (num_colors - 1)
-        std::unordered_map<Integral, size_t> greedyColoring(size_t &num_colors)
+        std::unordered_map<Integral, size_t> greedyColoring(size_t &num_colors) const
         {
+            std::vector<Integral> v;
+            vertices(std::back_inserter(v));
 
+            // just use the order we were given
+            return greedyColoring(num_colors, v);
+        }
+
+        // returns a map with the key being the vertex and the value being the color
+        // color is from 0 to (num_colors - 1)
+        std::unordered_map<Integral, size_t> greedyColoring(size_t &num_colors,
+            std::vector<Integral> &orderedVertices) const
+        {
             std::unordered_map<Integral, size_t> m;
             num_colors = 0;
 
-            std::vector<Integral> v;
-            std::back_insert_iterator<std::vector<Integral>> vback(v);
-            vertices(vback);
-
-            for (auto const &vertex : v) {
+            for (auto const &vertex : orderedVertices) {
                 // tests which colors are occupied (true if occupied)
                 size_t v_degree = degree(vertex);
                 std::vector<bool> sieve(v_degree + 1);
                 std::fill(sieve.begin(), sieve.end(), false);
 
                 std::vector<Integral> vneighbors(v_degree);
-                // std::back_insert_iterator<std::vector<Integral>> vneighborsback(vneighbors);
                 neighbors(vertex, vneighbors.begin());
 
                 size_t min_color = 0;
-                for (auto const &n : vneighbors) {
+                for (auto const n : vneighbors) {
                     try {
                         size_t n_color = m.at(n);
                         sieve[n_color] = true;
@@ -182,6 +197,120 @@ class UndirectedGraph
             num_colors++;
 
             return m;
+        }
+
+        std::unordered_map<Integral, size_t> largestDegreeFirstColoring(size_t &num_colors) const
+        {
+            std::vector<Integral> v;
+            vertices(std::back_inserter(v));
+
+            // implement the algorithm from matula and beck 1983
+            std::vector<std::unordered_set<Integral>> deglists;
+            std::unordered_map<Integral, bool> eliminated;
+            // std::fill(eliminated.begin(), eliminated.end(), false);
+            for (auto const &vertex : v) {
+                eliminated[vertex] = false;
+                size_t deg = degree(vertex);
+                while (deg >= deglists.size()) {
+                    deglists.push_back({});
+                }
+                deglists[deg].insert(vertex);
+            }
+
+            size_t num_left = v.size();
+            std::vector<Integral> sdl_order;
+            while (num_left > 0) {
+                auto &s = deglists.back();
+                size_t deg = deglists.size()-1;
+                if (s.size() == 0) {
+                    deglists.pop_back();
+                } else {
+                    auto const vertex = *(s.begin());
+                    sdl_order.push_back(vertex);
+                    s.erase(vertex);
+                    eliminated[vertex] = true;
+                    std::vector<Integral> vneighbors(degree(vertex));
+                    neighbors(vertex, vneighbors.begin());
+                    for (auto const &n: vneighbors) {
+                        if (eliminated[n]) {
+                            continue;
+                        }
+
+                        for (size_t trial_deg = deg; trial_deg > 0; trial_deg--) {
+                            if (deglists[trial_deg].erase(n) == 1) {
+                                deglists[trial_deg-1].insert(n);
+                                break;
+                            }
+                        }
+                    }
+                    num_left--;
+                }
+            }
+
+            if (sdl_order.size() != v.size()) {
+                throw std::runtime_error("wrong size!");
+            }
+
+            // use the SDL ordering with greedy coloring.
+            return greedyColoring(num_colors, sdl_order);
+        }
+
+        std::unordered_map<Integral, size_t> smallestDegreeLastColoring(size_t &num_colors) const
+        {
+            std::vector<Integral> v;
+            vertices(std::back_inserter(v));
+
+            // implement the algorithm from matula and beck 1983
+            std::vector<std::unordered_set<Integral>> deglists;
+            std::unordered_map<Integral, bool> eliminated;
+            // std::fill(eliminated.begin(), eliminated.end(), false);
+            for (auto const &vertex : v) {
+                eliminated[vertex] = false;
+                size_t deg = degree(vertex);
+                while (deg >= deglists.size()) {
+                    deglists.push_back({});
+                }
+                deglists[deg].insert(vertex);
+            }
+
+            size_t num_left = v.size();
+            std::vector<Integral> sdl_order;
+            while (num_left > 0) {
+                auto &s = deglists[0];
+                size_t deg = deglists.size()-1;
+                if (s.size() == 0) {
+                    deglists.erase(deglists.begin());
+                } else {
+                    auto const vertex = *(s.begin());
+                    sdl_order.push_back(vertex);
+                    s.erase(vertex);
+                    eliminated[vertex] = true;
+                    std::vector<Integral> vneighbors(degree(vertex));
+                    neighbors(vertex, vneighbors.begin());
+                    for (auto const &n: vneighbors) {
+                        if (eliminated[n]) {
+                            continue;
+                        }
+
+                        for (size_t trial_deg = deg; trial_deg > 0; trial_deg--) {
+                            if (deglists[trial_deg].erase(n) == 1) {
+                                deglists[trial_deg-1].insert(n);
+                                break;
+                            }
+                        }
+                    }
+                    num_left--;
+                }
+            }
+
+            std::reverse(sdl_order.begin(), sdl_order.end());
+
+            if (sdl_order.size() != v.size()) {
+                throw std::runtime_error("wrong size!");
+            }
+
+            // use the SDL ordering with greedy coloring.
+            return greedyColoring(num_colors, sdl_order);
         }
 };
 

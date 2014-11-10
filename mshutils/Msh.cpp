@@ -229,12 +229,47 @@ void Mesh::colorElements()
     size_t colors;
     {
     Timer x("actual coloring");
-    g.greedyColoring(colors);
+    //g.greedyColoring(colors);
+    auto m = g.smallestDegreeLastColoring(colors);
+    for (auto const &kv : m) {
+        Elements[kv.first].color = kv.second;
+    }
     }
     std::cout << "Mesh has " << Nodes.size() << " vertices.\n";
     std::cout << "Mesh has " << Elements.size() << " elements.\n";
     std::cout << "Colored mesh with " << colors << " colors.\n";
     // std::cout << g.print();
+    return;
+}
+
+void Mesh::writeMT2(std::ostream &output)
+{
+    const size_t buflen = 64;
+    char buf[buflen];
+    
+    for (auto const &kv : Nodes) {
+        auto const &node = kv.second;
+        output << "N," << node.id << ',';
+        std::snprintf(buf, buflen, "%la", node.x);
+        output << buf << ',';
+        std::snprintf(buf, buflen, "%la", node.y);
+        output << buf << ',';
+        std::snprintf(buf, buflen, "%la", node.z);
+        output << buf << '\n';
+    }
+
+    for (auto const &kv : Elements) {
+        auto const &element = kv.second;
+        if (element.type != 2) {
+            continue;
+        }
+        output << "E," << element.id << ',';
+        output << element.color;
+        for (auto const &n : element.NodeIds) {
+            output << ',' << n;
+        }
+        output << '\n';
+    }
     return;
 }
 
