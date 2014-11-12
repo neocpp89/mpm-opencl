@@ -52,6 +52,7 @@ class MaterialPoint3
         std::string getCSVHeaderString()
         {
             std::stringstream ss;
+            ss << "id,";
             ss << "x,y,z,";
             ss << "x_t,y_t,z_t,";
             ss << "Txx,Txy,Txz,Tyy,Tyz,Tzz,";
@@ -76,6 +77,8 @@ class MaterialPoint3
             std::stringstream ss;
             const size_t buflen = 64;
             char buf[buflen];
+
+            ss << id << ',';
 
             std::snprintf(buf, buflen, "%la", Position.x);
             ss << buf << ',';
@@ -133,6 +136,7 @@ class MaterialPoint3
             if (format != nullptr) {
                 ss << format;
             }
+            ss << id << ','; 
             ss << Position.x << ',' << Position.y << ',' << Position.z << ',';
             ss << Velocity.x << ',' << Velocity.y << ',' << Velocity.z << ',';
             ss << CauchyStress(0,0) << ','

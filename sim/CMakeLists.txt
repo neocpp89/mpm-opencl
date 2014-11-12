@@ -1,4 +1,5 @@
-ADD_EXECUTABLE(mpm-opencl Simulate.cpp)
+ADD_EXECUTABLE(mpm-opencl Simulate.cpp Simulation.cpp)
+target_link_libraries(mpm-opencl configparser)
 configure_file(MPMKernels.cl ${CMAKE_CURRENT_BINARY_DIR}/MPMKernels.cl COPYONLY)
 TARGET_LINK_LIBRARIES(mpm-opencl ${OPENCL_LIBRARY})
 TARGET_LINK_LIBRARIES(mpm-opencl ${ZLIB_LIBRARY})

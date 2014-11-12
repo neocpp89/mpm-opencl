@@ -14,6 +14,8 @@
 #include "MaterialPoint.hpp"
 #include "gzstream.hpp"
 
+#include "Simulation.hpp"
+
 //! You will need to tweak these 2 parameters
 //! Using 0 will always choose the 1st implementation found
 #define PLATFORM_TO_USE 0
@@ -21,6 +23,11 @@
 
 int main(int argc, char ** argv)
 {
+    std::string cfgfile = "test.cfg";
+    mpm::Simulation s;
+
+    s.readConfigFile(cfgfile);
+    std::cout << s << std::endl;
 
 try {
 
