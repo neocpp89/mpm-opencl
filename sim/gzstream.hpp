@@ -35,6 +35,9 @@
 #include <zlib.h>
 #include <string>
 
+// memcpy
+#include <cstring>
+
 #ifdef GZSTREAM_NAMESPACE
 namespace GZSTREAM_NAMESPACE {
 #endif

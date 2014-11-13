@@ -49,7 +49,7 @@ class MaterialPoint3
             return;
         }
 
-        std::string getCSVHeaderString()
+        std::string getCSVHeaderString() const
         {
             std::stringstream ss;
             ss << "id,";
@@ -72,7 +72,7 @@ class MaterialPoint3
             I would have just passed std::hexfloat to getCSVRowString,
             however it is not implemented in libstdc++/g++ yet (Oct 2014).
         */
-        std::string getCSVHexRowString()
+        std::string getCSVHexRowString() const
         {
             std::stringstream ss;
             const size_t buflen = 64;
@@ -84,14 +84,14 @@ class MaterialPoint3
             ss << buf << ',';
             std::snprintf(buf, buflen, "%la", Position.y);
             ss << buf << ',';
-            std::snprintf(buf, buflen, "%la", Position.y);
+            std::snprintf(buf, buflen, "%la", Position.z);
             ss << buf << ',';
 
             std::snprintf(buf, buflen, "%la", Velocity.x);
             ss << buf << ',';
             std::snprintf(buf, buflen, "%la", Velocity.y);
             ss << buf << ',';
-            std::snprintf(buf, buflen, "%la", Velocity.y);
+            std::snprintf(buf, buflen, "%la", Velocity.z);
             ss << buf << ',';
 
             std::snprintf(buf, buflen, "%la", CauchyStress(0,0));
@@ -129,7 +129,7 @@ class MaterialPoint3
             return ss.str();
         }
  
-        std::string getCSVRowString(std::ios_base &(format)(std::ios_base &) = std::scientific)
+        std::string getCSVRowString(std::ios_base &(format)(std::ios_base &) = std::scientific) const
         {
             std::stringstream ss;
             // ss << std::hexfloat; //not implemented in libstdc++/g++...

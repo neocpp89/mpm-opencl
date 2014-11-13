@@ -4,7 +4,6 @@
 #include <exception>
 #include <string>
 
-template<int output_type, typename Iter>
 class Writer{
     private:
         std::string filename;
@@ -18,7 +17,8 @@ class Writer{
         }
         ~Writer() { fout.close(); return; }
 
-        void WriteCSV(std::string &filename, Iter begin, Iter end)
+        template<typename Iter>
+        void WriteCSV(Iter begin, Iter end)
         {
             if (fout.fail()) {
                 throw std::runtime_error("Can't write to file \'" + filename + "\'.\n");
@@ -26,9 +26,9 @@ class Writer{
             if (begin == end) {
                 return;
             }
-            fout << (*begin).getCSVHeaderString();
+            fout << (*begin).getCSVHeaderString() << '\n';
             for (auto i = begin; i != end; i++) {
-                fout << (*i).getCSVRowString();
+                fout << (*i).getCSVRowString() << '\n';
             }
             return;
         }
