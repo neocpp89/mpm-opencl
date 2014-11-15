@@ -276,31 +276,34 @@ class UndirectedGraph
             size_t num_left = v.size();
             std::vector<Integral> sdl_order;
             while (num_left > 0) {
-                auto &s = deglists[0];
-                size_t deg = deglists.size()-1;
-                if (s.size() == 0) {
-                    deglists.erase(deglists.begin());
-                } else {
-                    auto const vertex = *(s.begin());
-                    sdl_order.push_back(vertex);
-                    s.erase(vertex);
-                    eliminated[vertex] = true;
-                    std::vector<Integral> vneighbors(degree(vertex));
-                    neighbors(vertex, vneighbors.begin());
-                    for (auto const &n: vneighbors) {
-                        if (eliminated[n]) {
-                            continue;
-                        }
+                auto p = deglists.begin();
+                while ((*p).size() == 0) {
+                    p++;
+                    if (p == deglists.end()) {
+                        throw std::runtime_error("No elements left to color.");
+                    }
+                }
+                auto &s = *p;
+                const size_t deg = deglists.size()-1;
+                auto const vertex = *(s.begin());
+                sdl_order.push_back(vertex);
+                s.erase(vertex);
+                eliminated[vertex] = true;
+                std::vector<Integral> vneighbors(degree(vertex));
+                neighbors(vertex, vneighbors.begin());
+                for (auto const &n: vneighbors) {
+                    if (eliminated[n]) {
+                        continue;
+                    }
 
-                        for (size_t trial_deg = deg; trial_deg > 0; trial_deg--) {
-                            if (deglists[trial_deg].erase(n) == 1) {
-                                deglists[trial_deg-1].insert(n);
-                                break;
-                            }
+                    for (size_t trial_deg = deg; trial_deg > 0; trial_deg--) {
+                        if (deglists[trial_deg].erase(n) == 1) {
+                            deglists[trial_deg-1].insert(n);
+                            break;
                         }
                     }
-                    num_left--;
                 }
+                num_left--;
             }
 
             std::reverse(sdl_order.begin(), sdl_order.end());

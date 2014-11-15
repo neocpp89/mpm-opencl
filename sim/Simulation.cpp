@@ -138,6 +138,21 @@ void Simulation::readParticles(const std::string &filename, bool compressed)
             p.TimeAveragedCauchyStress(1,0) = p.TimeAveragedCauchyStress(0,1);
             p.TimeAveragedCauchyStress(2,0) = p.TimeAveragedCauchyStress(0,2);
             p.TimeAveragedCauchyStress(2,1) = p.TimeAveragedCauchyStress(1,2);
+
+            // delete the known keys (above), add everything else in the map
+            // as a state variable.
+            for (auto const &known : {
+                    "id",
+                    "x", "y", "z",
+                    "x_t", "y_t", "z_t",
+                    "Txx", "Txy", "Txz", "Tyy", "Tyz", "Tzz",
+                    "Txx_bar", "Txy_bar", "Txz_bar", "Tyy_bar", "Tyz_bar", "Tzz_bar"
+                }) {
+                m.erase(known); 
+            }
+            for (auto const &kv : m) {
+                p.StateVariables[kv.first] = std::stod(kv.second);
+            }
         }
     }
     
