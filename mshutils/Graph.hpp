@@ -199,6 +199,78 @@ class UndirectedGraph
             return m;
         }
 
+        // returns a map with the key being the vertex and the value being the color
+        // color is from 0 to (num_colors - 1)
+        // Balanced coloring tries to split the elements up evenly, so the number
+        // of colors may be suboptimal.
+        std::unordered_map<Integral, size_t> balancedColoring(size_t &num_colors,
+            std::vector<Integral> &orderedVertices) const
+        {
+            std::unordered_map<Integral, size_t> m;
+            std::vector<size_t> number_of_vertices_per_color;
+            std::vector<bool> sieve;
+
+            num_colors = 0;
+            for (auto const &vertex : orderedVertices) {
+                // tests which colors are occupied (true if occupied)
+                size_t v_degree = degree(vertex);
+                while (v_degree >= sieve.size()) {
+                    sieve.push_back(false);
+                }
+                while (v_degree >= number_of_vertices_per_color.size()) {
+                    number_of_vertices_per_color.push_back(0);
+                }
+                std::fill(sieve.begin(), sieve.end(), false);
+
+                std::vector<Integral> vneighbors(v_degree);
+                neighbors(vertex, vneighbors.begin());
+
+                for (auto const n : vneighbors) {
+                    try {
+                        size_t n_color = m.at(n);
+                        sieve[n_color] = true;
+                    } catch (std::out_of_range &e) {
+                        // not in the map yet; ignore it.
+                    }
+                }
+
+                size_t min_color_idx = 0;
+                size_t least_occupied_color = 0;
+                size_t new_color_idx = number_of_vertices_per_color.size();
+                for (size_t i = 0; i < sieve.size(); i++) {
+                    if (sieve[i] == false) {
+                        if (number_of_vertices_per_color[i] == 0 && i <= new_color_idx) {
+                            new_color_idx = i;
+                        } else {
+                            if (least_occupied_color == 0 || number_of_vertices_per_color[i] <
+                                least_occupied_color) {
+                                min_color_idx = i;
+                                least_occupied_color = number_of_vertices_per_color[i];
+                            }
+                        }
+                    }
+                }
+
+                size_t color = 0;
+                if (least_occupied_color == 0) {
+                    color = new_color_idx;
+                } else {
+                    color = min_color_idx;
+                }
+
+                if (color > num_colors) {
+                    num_colors = color;
+                }
+
+                m.insert(std::make_pair(vertex, color));
+                number_of_vertices_per_color[color]++;
+            }
+            
+            num_colors++;
+
+            return m;
+        }
+
         std::unordered_map<Integral, size_t> largestDegreeFirstColoring(size_t &num_colors) const
         {
             std::vector<Integral> v;
@@ -255,7 +327,7 @@ class UndirectedGraph
             return greedyColoring(num_colors, sdl_order);
         }
 
-        std::unordered_map<Integral, size_t> smallestDegreeLastColoring(size_t &num_colors) const
+        std::unordered_map<Integral, size_t> smallestDegreeLastColoring(size_t &num_colors, bool balanced = false) const
         {
             std::vector<Integral> v;
             vertices(std::back_inserter(v));
@@ -274,6 +346,7 @@ class UndirectedGraph
             }
 
             size_t num_left = v.size();
+            const size_t deg = deglists.size()-1;
             std::vector<Integral> sdl_order;
             while (num_left > 0) {
                 auto p = deglists.begin();
@@ -284,7 +357,6 @@ class UndirectedGraph
                     }
                 }
                 auto &s = *p;
-                const size_t deg = deglists.size()-1;
                 auto const vertex = *(s.begin());
                 sdl_order.push_back(vertex);
                 s.erase(vertex);
@@ -312,8 +384,12 @@ class UndirectedGraph
                 throw std::runtime_error("wrong size!");
             }
 
-            // use the SDL ordering with greedy coloring.
-            return greedyColoring(num_colors, sdl_order);
+            // use the SDL ordering with balanced or greedy coloring.
+            if (balanced) {
+                return balancedColoring(num_colors, sdl_order);
+            } else {
+                return greedyColoring(num_colors, sdl_order);
+            }
         }
 };
 
