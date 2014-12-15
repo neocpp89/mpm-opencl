@@ -15,6 +15,7 @@
 #include "clerror.hpp"
 #include "Timer.hpp"
 #include "Simulation.hpp"
+#include "GitSHA1.hpp"
 
 #include "optionparser.h"
 
@@ -56,7 +57,7 @@ struct Arg : public option::Arg
 
 enum optionIndex {UNKNOWN, HELP, TRIPOWER, DEVICE, PLATFORM}; 
 const option::Descriptor usage[] = {
-    { UNKNOWN, 0, "", "", Arg::Unknown, "usage: TriangleTest [options]\n\nOptions:" },
+    { UNKNOWN, 0, "", "", Arg::Unknown, "usage: mpm-opencl [options]\n\nOptions:" },
     { HELP, 0, "h", "help", Arg::None, "    -h, --help \t Print usage and exit." },
     { TRIPOWER, 0, "t", "triangle-exponent", Arg::Numeric, "    -t <T>, --triangle-exponent=<T> \t Tests 2^<T> triangles on selected device." },
     { DEVICE, 0, "d", "device", Arg::Numeric, "    -d <D>, --device=<D> \t Use device <D> on selected platform <P>." },
@@ -66,6 +67,7 @@ const option::Descriptor usage[] = {
 
 int main(int argc, char ** argv)
 {
+    std::cout << argv[0] << ": Git Hash: " << g_GIT_SHA1 << "\n";
     mpm::Simulation s;
     s.readConfigFile("test.csv");
     s.initializeOpenCL();

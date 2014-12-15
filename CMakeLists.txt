@@ -3,6 +3,10 @@ PROJECT(mpm-opencl)
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 SET(CMAKE_CXX_FLAGS "-march=native -std=c++11 -g -O3 -Wall -Wextra")
 
+# generate string containing git hash.
+include(GetGitRevisionDescription)
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+
 FIND_PACKAGE(OpenCL REQUIRED)
 FIND_PACKAGE(ZLIB REQUIRED)
 INCLUDE_DIRECTORIES(${OPENCL_INCLUDE_DIR})

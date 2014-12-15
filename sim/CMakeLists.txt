@@ -1,4 +1,7 @@
-ADD_EXECUTABLE(mpm-opencl Simulate.cpp Simulation.cpp)
+set(SOURCES Simulate.cpp Simulation.cpp)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitSHA1.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" @ONLY)
+list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" GitSHA1.hpp)
+ADD_EXECUTABLE(mpm-opencl ${SOURCES})
 target_link_libraries(mpm-opencl configparser)
 configure_file(MPMKernels.cl ${CMAKE_CURRENT_BINARY_DIR}/MPMKernels.cl COPYONLY)
 configure_file(particles.csv ${CMAKE_CURRENT_BINARY_DIR}/particles.csv COPYONLY)

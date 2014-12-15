@@ -1,0 +1,4 @@
+#include <string>
+
+#define GIT_SHA1 "@GIT_SHA1@"
+extern const std::string g_GIT_SHA1(GIT_SHA1);
