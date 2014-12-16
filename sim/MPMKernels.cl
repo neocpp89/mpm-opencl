@@ -59,6 +59,33 @@ inline double4 tri2d_local_from_global(
     return local_coords;
 }
 
+inline double4 tri2d_shape_functions(
+    double4 local_coords,
+    double2 A,
+    double2 B,
+    double2 C
+)
+{
+    // for triangular elements, the local coordinates are the shape functions.
+    return local_coords;
+}
+inline double8 tri2d_gradient_shape_functions(
+    double4 local_coords,
+    double2 A,
+    double2 B,
+    double2 C
+)
+{
+    const double detJ = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+    double4 ddx = (B.y - C.y, C.y - A.y, A.y - B.y, 0);
+    double4 ddy = (C.x - B.x, A.x - C.x, B.x - A.x, 0);
+    ddx = ddx / detJ;
+    ddy = ddy / detJ;
+    // low parts are d/dx, high parts are d/dy
+    const double8 dsf = (double8)(ddx, ddy);
+    return dsf;
+}
+
 __kernel
 void tri2d_local_coordinates(
     ulong num_particles,
@@ -132,6 +159,10 @@ void tri2d_sort_into_elements_full(
                 // point is inside the triangle
                 local_coordinates[i] = sf;
                 active[i] = 1;
+                // go ahead and calculate the shape functions
+                // and shape function gradients too
+                tri2d_shape_functions(sf, a, b, c);
+                tri2d_gradient_shape_functions(sf, a, b, c);
                 break;
             }
         }
