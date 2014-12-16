@@ -68,7 +68,8 @@ const option::Descriptor usage[] = {
 
 int main(int argc, char ** argv)
 {
-    argc -= (argc > 0); argv += (argc > 0); // skip program name.
+    const std::string programName(argv[0]); // save program name for later.
+    argc -= (argc > 0); argv += (argc > 0); // skip program name for arguments.
     option::Stats stats(usage, argc, argv);
     std::unique_ptr<option::Option[]> options(new option::Option[stats.options_max]);
     std::unique_ptr<option::Option[]> buffer(new option::Option[stats.buffer_max]);
@@ -276,7 +277,7 @@ int main(int argc, char ** argv)
         exit(EXIT_FAILURE);
     }
 
-    ALLPASSED(argv[0]);
+    ALLPASSED(programName);
     return EXIT_SUCCESS;
 }
 

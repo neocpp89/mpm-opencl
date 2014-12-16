@@ -201,9 +201,10 @@ int main(int argc, char ** argv)
         }
 
         // Copy host data to device buffers.
-        queue.enqueueWriteBuffer(d_A, CL_TRUE, 0, numTris*sizeof(cl_double2), A.get());
-        queue.enqueueWriteBuffer(d_B, CL_TRUE, 0, numTris*sizeof(cl_double2), B.get());
-        queue.enqueueWriteBuffer(d_C, CL_TRUE, 0, numTris*sizeof(cl_double2), C.get());
+        queue.enqueueWriteBuffer(d_A, CL_FALSE, 0, numTris*sizeof(cl_double2), A.get());
+        queue.enqueueWriteBuffer(d_B, CL_FALSE, 0, numTris*sizeof(cl_double2), B.get());
+        queue.enqueueWriteBuffer(d_C, CL_FALSE, 0, numTris*sizeof(cl_double2), C.get());
+        queue.finish();
 
         std::ifstream sourceFileName;
         sourceFileName.open("MPMKernels.cl");
@@ -223,10 +224,16 @@ int main(int argc, char ** argv)
                             );
 
         cl::Program rotn_program(context, mpmkernels_source);
+        try {
         err = rotn_program.build(devices);
-        std::string buildlog = rotn_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0], &err);
+        } catch (const cl::Error &exerr) {
+            std::string buildlog = rotn_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0], &err);
+            std::cout << "Error in build log:\n" << buildlog << std::endl;
+            throw;
+        }
 
         if (verbose) {
+            std::string buildlog = rotn_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0], &err);
             std::cout << "Read Kernel:\n" << sourceFile << std::endl;
             std::cout << "Build log:\n" << buildlog << std::endl;
         }
@@ -270,7 +277,7 @@ int main(int argc, char ** argv)
             }
         }
 
-    } catch(cl::Error err) {
+    } catch(const cl::Error &err) {
         std::cerr << "OpenCL Error: " << err.what() << " (" << CLErrorMap.at(err.err()) << ")" << std::endl;
         exit(EXIT_FAILURE);
     }

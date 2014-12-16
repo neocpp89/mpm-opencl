@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <istream>
 #include <ostream>
 #include <memory>
 
@@ -31,6 +32,7 @@ class Simulation
         double currentTime;
         size_t currentFrame;
 
+        void readParticles(std::istream &is);
         void readParticles(const std::string &filename, bool compressed = false);
         void readMesh(const std::string &filename);
         void writeParticles(bool hexformat = true) const;
@@ -51,7 +53,7 @@ class Simulation
 
         void preprocess();
 
-        void copyToOpenCLDevice() const;
+        void copyToOpenCLDevice();
         void copyFromOpenCLDevice();
 
         void writeFrame(bool outputParticles = true, bool outputElements = false) const;

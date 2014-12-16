@@ -99,4 +99,42 @@ void tri2d_local_coordinates_from_nodelist(
         const double2 c = node_coordinates[C_id];
         local_coordinates[i] = tri2d_local_from_global(p, a, b, c);
     }
+    return;
+}
+
+__kernel
+void tri2d_sort_into_elements_full(
+    ulong num_particles,
+    ulong num_elements,
+    __global double2* global_coordinates,
+    __global ulong4* node_ids_from_element_map,
+    __global ulong* element_id_from_particle_map,
+    __global double2* node_coordinates,
+    __global double4* local_coordinates,
+    __global uchar* active)
+{
+    const ulong i = get_global_id(0);
+    if (i < num_particles && active[i] != 0) {
+        active[i] = 0;
+        for (ulong j = 0; j < num_elements; j++) {
+            const ulong4 node_ids = node_ids_from_element_map[j];
+            const ulong A_id = node_ids.x;
+            const ulong B_id = node_ids.y;
+            const ulong C_id = node_ids.z;
+            const double2 p = global_coordinates[i];
+            const double2 a = node_coordinates[A_id];
+            const double2 b = node_coordinates[B_id];
+            const double2 c = node_coordinates[C_id];
+            const double4 sf = tri2d_local_from_global(p, a, b, c);
+            if (sf.x >= 0 && sf.x <= 1 &&
+                sf.y >= 0 && sf.y <= 1 &&
+                sf.z >= 0 && sf.z <= 1) {
+                // point is inside the triangle
+                local_coordinates[i] = sf;
+                active[i] = 1;
+                break;
+            }
+        }
+    }
+    return;
 }

@@ -151,7 +151,7 @@ void Mesh::readMshFile(std::istream &input)
         std::getline(input, s);
         if (inSection) {
             // Check if the section ended and send to a specialized parser.
-            if (s.substr(0, 4) == "$End") {
+            if (s.size() >= 5 && s.substr(0, 4) == "$End") {
                 switch (currentSection) {
                     case MshSections::MeshFormat:
                         parseMeshFormatSection(ss);
