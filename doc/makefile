@@ -1,4 +1,5 @@
 TEXSRC = \
+    memory-layout.tex \
     structured-grid-numbering.tex \
 	tri-2d-element.tex \
     quad-2d-element.tex
