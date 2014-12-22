@@ -219,16 +219,16 @@ int main(int argc, char ** argv)
                                 )
                             );
 
-        cl::Program rotn_program(context, mpmkernels_source);
-        err = rotn_program.build(devices);
-        std::string buildlog = rotn_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0], &err);
+        cl::Program spatial_program(context, mpmkernels_source);
+        err = spatial_program.build(devices);
+        std::string buildlog = spatial_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(devices[0], &err);
 
         if (verbose) {
             std::cout << "Read Kernel:\n" << sourceFile << std::endl;
             std::cout << "Build log:\n" << buildlog << std::endl;
         }
 
-        cl::Kernel tri2d_sorting_kernel(rotn_program, "tri2d_sort_into_elements_full", &err);
+        cl::Kernel tri2d_sorting_kernel(spatial_program, "tri2d_sort_into_elements_full", &err);
 
         std::vector<std::pair<cl::Buffer, cl_double4>> pointSets;
         pointSets.push_back(std::make_pair(d_A, (cl_double4){1, 0, 0, 0}));
