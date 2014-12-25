@@ -29,8 +29,9 @@ For a more general review, please see the paper by \textcite{buzzi08}.
 \tikzstyle{cpuborder}=[thick, draw=blue!80!black]
 \tikzstyle{cpushade}=[shade, top color=blue!10, bottom color=blue!80!black!20]
 \tikzstyle{oncpu}=[draw=blue!40!black, shade, top color=blue!70!black!2, bottom color=blue!70!black!5]
-\tikzstyle{copy}=[draw=black,dashed]
-\tikzstyle{function}=[draw=black,dotted]
+\tikzstyle{copy}=[draw=black,dashed,-{Stealth[scale=3]}]
+\tikzstyle{function}=[draw=black,dotted,-{Stealth[scale=3]}]
+\tikzstyle{functionbox}=[rounded corners=3pt, draw=black, fill=black!5]
 \tikzstyle{ms}=[minimum size=0.5in]
 
 % Background 'containers'
@@ -43,8 +44,8 @@ For a more general review, please see the paper by \textcite{buzzi08}.
 \node[ongpu, ms, circle] (gpu-init-pstate) at (4.5in, 2in) {Load};
 \node[ongpu, ms] (gpu-init-mstate) at (5in, 3in) {Load};
 
-\path[copy,-{Stealth[scale=3]}] (init-pstate) -- (gpu-init-pstate);
-\path[copy,-{Stealth[scale=3]}] (init-mstate) -- (gpu-init-mstate);
+\path[copy] (init-pstate) -- (gpu-init-pstate) node[functionbox, pos=0.5] {Copy};
+\path[copy] (init-mstate) -- (gpu-init-mstate);
 \end{tikzpicture}
 
 \printbibliography
