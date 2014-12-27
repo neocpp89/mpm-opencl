@@ -38,22 +38,22 @@ For a more general review, please see the paper by \textcite{buzzi08}.
 \tikzstyle{particle}=[ms, circle]
 
 % Background 'containers'
-\path[cpushade, cpuborder, rounded corners=5pt] (0, 0) -- (0, 4in) -- (2in, 4in) node[pos=0.5, fill=white, cpuborder] {CPU} -- (2in, 0) -- cycle;
-\path[gpushade, gpuborder, rounded corners=5pt] (4in, 0) -- (4in, 4in) -- (6in, 4in) node[pos=0.5, fill=white, gpuborder] {GPU} -- (6in, 0) -- cycle;
+\path[cpushade, cpuborder, rounded corners=5pt] (0, 0) -- (0, 6in) -- (2in, 6in) node[pos=0.5, fill=white, cpuborder] {CPU} -- (2in, 0) -- cycle;
+\path[gpushade, gpuborder, rounded corners=5pt] (4in, 0) -- (4in, 6in) -- (6in, 6in) node[pos=0.5, fill=white, gpuborder] {GPU} -- (6in, 0) -- cycle;
 
-\coordinate (start-particle) at (0.5in, 4in);
-\coordinate (start-mesh) at (1in, 4in);
+\coordinate (start-particle) at (0.5in, 6in);
+\coordinate (start-mesh) at (1.5in, 6in);
 
-\node[oncpu, particle] (init-pstate) at (0.5in, 2in) {};
-\node[oncpu, mesh] (init-mstate) at (1in, 3in) {};
+\node[oncpu, particle] (init-pstate) at (0.5in, 4in) {};
+\node[oncpu, mesh] (init-mstate) at (1.5in, 5in) {};
 
-\node[ongpu, particle] (gpu-init-pstate) at (4.5in, 2in) {};
-\node[ongpu, mesh] (gpu-init-mstate) at (5in, 3in) {};
+\node[ongpu, particle] (gpu-init-pstate) at (4.5in, 4in) {};
+\node[ongpu, mesh] (gpu-init-mstate) at (5.5in, 5in) {};
 
 \path[copy] (init-pstate) -- (gpu-init-pstate) node[functionbox, pos=0.5] {Copy};
 \path[copy] (init-mstate) -- (gpu-init-mstate) node[functionbox, pos=0.5] {Copy};
 
-\path[function] (start-particle) -- (init-pstate) node[functionbox, pos=0.5] {Load \\ Particles};
+\path[function] (start-particle) -- (init-pstate) node[functionbox, pos=0.33] {Load \\ Particles} node[functionbox, pos=0.66] {Bin \\ Particles};
 \path[function] (start-mesh) -- (init-mstate) node[functionbox, pos=0.5] {Load \\ Mesh};
 \end{tikzpicture}
 
