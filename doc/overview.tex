@@ -30,8 +30,8 @@ For a more general review, please see the paper by \textcite{buzzi08}.
 \tikzstyle{cpuborder}=[thick, draw=blue!80!black]
 \tikzstyle{cpushade}=[shade, top color=blue!10, bottom color=blue!80!black!20]
 \tikzstyle{oncpu}=[draw=blue!40!black, shade, top color=blue!70!black!2, bottom color=blue!70!black!5]
-\tikzstyle{copy}=[draw=black,dashed,-{Stealth[scale=3]}]
-\tikzstyle{function}=[draw=black,dotted,-{Stealth[scale=3]}]
+\tikzstyle{copy}=[draw=black,dashed,-{Stealth[scale=2]}]
+\tikzstyle{function}=[draw=black,dotted,-{Stealth[scale=2]}]
 \tikzstyle{functionbox}=[rounded corners=3pt, draw=black, fill=black!5, align=center]
 \tikzstyle{ms}=[minimum size=0.25in]
 \tikzstyle{mesh}=[ms]
@@ -48,6 +48,7 @@ For a more general review, please see the paper by \textcite{buzzi08}.
 \node[oncpu, mesh] (init-mstate) at (1.5in, 5in) {};
 
 \node[ongpu, particle] (gpu-init-pstate) at (4.5in, 4in) {};
+\node[ongpu, particle] (gpu-sf-pstate) at (4.5in, 3in) {};
 \node[ongpu, mesh] (gpu-init-mstate) at (5.5in, 5in) {};
 
 \path[copy] (init-pstate) -- (gpu-init-pstate) node[functionbox, pos=0.5] {Copy};
@@ -55,6 +56,8 @@ For a more general review, please see the paper by \textcite{buzzi08}.
 
 \path[function] (start-particle) -- (init-pstate) node[functionbox, pos=0.33] {Load \\ Particles} node[functionbox, pos=0.66] {Bin \\ Particles};
 \path[function] (start-mesh) -- (init-mstate) node[functionbox, pos=0.5] {Load \\ Mesh};
+
+\path[function] (gpu-init-pstate) -- (gpu-sf-pstate) node[functionbox, pos=0.5] {Calculate \\ $S_i(\mathbf{x}_p)$};
 \end{tikzpicture}
 
 \printbibliography
