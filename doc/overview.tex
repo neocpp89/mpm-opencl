@@ -60,6 +60,9 @@ For a more general review, please see the paper by \textcite{buzzi08}.
 \path[function] (gpu-init-pstate) -- (gpu-sf-pstate) node[functionbox, pos=0.5] {Calculate \\ $S_i(\mathbf{x}_p)$};
 \end{tikzpicture}
 
+The inital sorting of material points is done by the GPU, checking the particles against every element.
+For subsequent sortings, we use coherence, which means that particles most often will stay within the same element or move at most one element away during a timestep.
+
 \printbibliography
 
 \end{document}
