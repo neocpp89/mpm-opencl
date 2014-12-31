@@ -36,6 +36,23 @@ class Timer
             auto current = std::chrono::system_clock::now();
             return std::chrono::duration_cast<duration_type>(current - start).count();
         }
+
+        void reset()
+        {
+            start = std::chrono::system_clock::now();
+            return;
+        }
 };
+
+#ifndef NDEBUG
+using DebugTimer = Timer;
+#else
+/* Compile away to nothing if we are not debugging. */
+class DebugTimer
+{
+    public:
+        DebugTimer(std::string s = "") { return; }
+};
+#endif //NDEBUG
 
 #endif //TIMER_HPP
