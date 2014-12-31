@@ -61,7 +61,18 @@ For a more general review, please see the paper by \textcite{buzzi08}.
 \end{tikzpicture}
 
 The inital sorting of material points is done by the GPU, checking the particles against every element.
-For subsequent sortings, we use coherence, which means that particles most often will stay within the same element or move at most one element away during a timestep.
+For subsequent sortings, we use coherence, which means that particles most often will stay within the same element or move at most one element away during a time step.
+
+After sorting the particles into elements, we then compute the mapping functions $S_{i}(\mathbf{x}_p)$ and gradient of mapping functions $S_{i}(\mathbf{x}_p)$.
+Projection of particle state onto nodes is then done using these mappings.
+
+The mesh then moved by solving $\mathbf{f} = m \mathbf{a}$ at each node.
+
+This results in a velocity in each element, which is projected back onto the particles through the mapping functions.
+The gradient is also projected, which is then used to update the stress at the material point level.
+
+This concludes an MPM step.
+Note that all steps can be performed on the GPU without any copies to the CPU, excepting complications due to the material model.
 
 \printbibliography
 
