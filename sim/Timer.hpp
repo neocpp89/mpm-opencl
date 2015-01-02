@@ -8,8 +8,6 @@
 class Timer
 {
     std::string prefix;
-    std::chrono::milliseconds ms;
-
     std::chrono::system_clock::time_point start;
 
     public:
