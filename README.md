@@ -26,8 +26,10 @@ but has no licensing restriction.
 * [gzstream][1] (LGPL 2.1)
 * [The Lean Mean C++ Option Parser][2] (MIT license)
 * [zlib][3] (compatible with GPL)
+* [catch][4] (Boost Software License 1.0)
 
 [1]: https://gist.github.com/piti118/1508048
 [2]: http://optionparser.sourceforge.net/
 [3]: http://www.zlib.net/
+[4]: https://github.com/philsquared/Catch
 
