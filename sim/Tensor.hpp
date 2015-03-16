@@ -67,6 +67,7 @@ class Tensor
                 }
                 deviator(i, i) -= spherical;
             }
+            return;
         }
 
         Tensor deviator() const
