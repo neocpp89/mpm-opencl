@@ -1,7 +1,17 @@
 #include <iostream>
+#include <string>
+#include <sstream>
 
 #include "catch.hpp"
 #include "Configuration.hpp"
+
+std::string cfgfile_contents =
+R"(
+double_option = 45.25
+int_option = 32
+string_option = foo bar
+sizet_option = 352L
+)";
 
 TEST_CASE("Static Configuration Initialization", "[configuration][short]")
 {
@@ -41,7 +51,7 @@ TEST_CASE("Static Configuration Modification", "[configuration][short]")
     REQUIRE(cfg->getSizeTOption("sizet_option") == 9L);
 }
 
-TEST_CASE("Static Configuration File Read", "[configuration][short]")
+TEST_CASE("Static Configuration Stream Read", "[configuration][short]")
 {
     StaticConfiguration scfg;
     Configuration *cfg = dynamic_cast<Configuration *>(&scfg);
@@ -53,9 +63,9 @@ TEST_CASE("Static Configuration File Read", "[configuration][short]")
     scfg.addSizeTOption("sizet_option", 203L);
 
     // actually parse a configuration file specified to override defaults
-    const std::string cfgfile = "test.cfg";
+    std::istringstream iss(cfgfile_contents);
     //std::cout << "Read configuration file (\"" << cfgfile << "\")." << std::endl;
-    scfg.readConfigFile(cfgfile);
+    scfg.readConfigStream(iss);
     // std::cout << "Configuration: " << scfg << std::endl;
     REQUIRE(cfg->getDoubleOption("double_option") == 45.25);
     REQUIRE(cfg->getIntOption("int_option") == 32);
