@@ -26,3 +26,14 @@ add_test(Triangle TriangleTest)
 add_test(Graph GraphTest)
 add_test(Msh MshTest)
 add_test(SpatialBinning SpatialBinningTest)
+
+# Add tests in a semi-automated manner.
+
+file(GLOB UnitTests ./ "*Test.cpp")
+list(APPEND UnitTests "catchmain.cpp")
+add_executable(unit ${UnitTests})
+target_link_libraries(unit mshutils)
+target_link_libraries(unit configparser)
+target_link_libraries(unit ${ZLIB_LIBRARY})
+target_link_libraries(unit ${OPENCL_LIBRARY})
+add_test(unit unit)
