@@ -29,7 +29,6 @@ class Configuration
 
 class StaticConfiguration : public Configuration
 {
-    std::ifstream cfgstrm;
     bool strict;
 
     private:
@@ -54,6 +53,7 @@ class StaticConfiguration : public Configuration
         StaticConfiguration(bool _strict = true) : strict(_strict) { return; }
         ~StaticConfiguration() { return; }
 
+        void readConfigStream(std::istream &cfgstream);
         void readConfigFile(std::string const &cfgfile);
         void updateConfig() { binOptions(); return; }
         

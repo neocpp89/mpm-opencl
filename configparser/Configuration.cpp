@@ -65,14 +65,13 @@ void StaticConfiguration::setInTypedDict(std::string const &k, std::string const
     return;
 }
 
-void StaticConfiguration::readConfigFile(std::string const &cfgfile)
+void StaticConfiguration::readConfigStream(std::istream &cfgstream)
 {
-    cfgstrm.open(cfgfile);
-    size_t line = 0;
+    std::size_t line = 0;
     do {
         line++;
-        std::vector<std::string> tokens = Tokenizer::splitNextLine(cfgstrm, '=');
-        if (cfgstrm.eof() || !cfgstrm.good()) {
+        std::vector<std::string> tokens = Tokenizer::splitNextLine(cfgstream, '=');
+        if (cfgstream.eof() || !cfgstream.good()) {
             break;
         }
         if (tokens.size() == 0 || tokens[0][0] == '#') {
@@ -97,6 +96,13 @@ void StaticConfiguration::readConfigFile(std::string const &cfgfile)
         }
     } while (true);
     updateConfig();
+    return;
+}
+
+void StaticConfiguration::readConfigFile(std::string const &cfgfile)
+{
+    std::ifstream cfgstream(cfgfile);
+    this->readConfigStream(cfgstream);
     return;
 }
 void StaticConfiguration::addDoubleOption(std::string s, double default_value)
