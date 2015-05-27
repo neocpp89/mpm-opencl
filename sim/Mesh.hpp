@@ -28,6 +28,37 @@ using Vector2 = Point2<Real>;
 template <typename Real>
 using Vector3 = Point3<Real>;
 
+template <typename Real = double, typename PointIter, typename Iter>
+void BarycentricWeights(PointIter pbegin, PointIter pend, Iter begin, Iter end)
+{
+    return;
+}
+
+template <typename Real = double>
+class P1QuadMasterElement
+{
+    private:
+    Point2<Real> corners[4] = {
+        {-1, -1},
+        {1, -1},
+        {1, 1},
+        {-1 ,1}
+    };
+
+    public:
+    Real[4] phi(const Point2<Real> &p) const
+    {
+        Real[4] corner_contribution;
+        return corner_contribution;
+    }
+
+    Vector2<Real>[4] gradphi(const Point2<Real> &p) const
+    {
+        Vector2<Real>[4] qq;
+        return qq;
+    }
+}
+
 template <typename Real = double>
 class StructuredFixedAR2D
 {
@@ -49,7 +80,7 @@ class StructuredFixedAR2D
         aspect = (Ly*Nx) / (Lx*Ny);
     }
 
-    const size_type getNumberOfElements() const
+    size_type getNumberOfElements() const
     {
         return Nx*Ny;
     }
