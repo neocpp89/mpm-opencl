@@ -144,7 +144,7 @@ void Mesh::parseElementsSection(std::stringstream &section)
 void Mesh::readMshFile(std::istream &input)
 {
     bool inSection = false;
-    MshSections currentSection;
+    MshSections currentSection = MshSections::Comment;
     std::stringstream ss;
     while (!input.fail()) {
         std::string s;
