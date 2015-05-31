@@ -340,7 +340,7 @@ class UndirectedGraph
                 eliminated[vertex] = false;
                 size_t deg = degree(vertex);
                 while (deg >= deglists.size()) {
-                    deglists.push_back({});
+                    deglists.push_back(std::unordered_set<Integral>());
                 }
                 deglists[deg].insert(vertex);
             }
