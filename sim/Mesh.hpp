@@ -1,14 +1,7 @@
 #ifndef MESH_HPP
 #define MESH_HPP
-#include <sstream>
-#include <ios>
-#include <string>
-#include <map>
-
-#include <cstdio>
-
+#include "MasterElement.hpp"
 #include "Tensor.hpp"
-
 
 template <typename Real>
 struct Point2
@@ -20,6 +13,12 @@ template <typename Real>
 struct Point3
 {
     Real x, y, z;
+};
+
+template <typename Real>
+struct P1QuadPoints
+{
+    Point2<Real> points[4];
 };
 
 /* Laziness.... */
@@ -40,16 +39,19 @@ class StructuredFixedAR2D
     const size_type Nx; // number of elements in x-direction
     const size_type Ny;
 
+    const master_element::P1Quad<Real> master;
+    
+
     public:
     StructuredFixedAR2D(const Point2<Real> &upper_left_, const Point2<Real> &lower_right_, const size_type Nx_, const size_type Ny_)
-        : upper_left(upper_left_), lower_right(lower_right_), Nx(Nx_), Ny(Ny_)
+        : upper_left(upper_left_), lower_right(lower_right_), Nx(Nx_), Ny(Ny_), master()
     {
         const Real Lx = lower_right.x - upper_left.x;
         const Real Ly = upper_left.y - lower_right.y;
         aspect = (Ly*Nx) / (Lx*Ny);
     }
 
-    const size_type getNumberOfElements() const
+    size_type getNumberOfElements() const
     {
         return Nx*Ny;
     }
