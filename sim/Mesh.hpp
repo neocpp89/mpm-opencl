@@ -1,5 +1,8 @@
 #ifndef MESH_HPP
 #define MESH_HPP
+#include <array>
+#include <vector>
+
 #include "MasterElement.hpp"
 #include "Tensor.hpp"
 
@@ -31,6 +34,7 @@ template <typename Real = double>
 class StructuredFixedAR2D
 {
     using size_type = std::size_t;
+    using id_type = int;
 
     private:
     Real aspect; // calculated as height over width of each element
@@ -40,6 +44,8 @@ class StructuredFixedAR2D
     const size_type Ny;
 
     const master_element::P1Quad<Real> master;
+
+    std::vector<std::array<id_type, 4>> element_to_node_map;
     
 
     public:
